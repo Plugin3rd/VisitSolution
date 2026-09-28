@@ -1,0 +1,4 @@
+@model IEnumerable<VisitRegistry.Models.OrganizationalUnit>
+@{ ViewData["Title"] = "واحدهای سازمانی"; }
+<div class="page-head"><h1>واحدهای سازمانی</h1>@if(User.IsInRole("مدیر سامانه")){<a class="button" asp-action="Create">واحد جدید</a>}</div>
+<div class="card table-wrap"><table><thead><tr><th>عنوان</th><th>کد</th><th>وضعیت</th><th>توضیحات</th></tr></thead><tbody>@foreach(var u in Model){<tr><td>@u.Title</td><td>@u.Code</td><td>@(u.IsActive ? "فعال" : "غیرفعال")</td><td>@u.Description</td></tr>}</tbody></table></div>

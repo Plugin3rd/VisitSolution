@@ -1,0 +1,13 @@
+@model IEnumerable<VisitRegistry.Models.Visit>
+@inject VisitRegistry.Services.PersianDateService PersianDate
+@{
+    ViewData["Title"] = "سوابق مراجعات";
+}
+<div class="page-head"><h1>سوابق مراجعات</h1><a class="button" asp-action="Create">ثبت مراجعه</a></div>
+<form method="get" class="searchbar"><input name="search" value="@Context.Request.Query["search"]" placeholder="نام، نام خانوادگی یا شماره ملی" /><button class="button secondary">جستجو</button></form>
+<div class="card table-wrap"><table><thead><tr><th>شخص</th><th>شماره ملی</th><th>تاریخ ورود</th><th>ورود</th><th>واحد مراجعه‌کننده</th><th>خروج</th><th>وضعیت</th><th>عملیات</th></tr></thead><tbody>
+@foreach (var item in Model)
+{
+<tr><td>@item.Person.FirstName @item.Person.LastName</td><td>@item.Person.NationalCode</td><td>@PersianDate.ToPersian(item.EntryDate)</td><td>@item.EntryTime.ToString(@"hh\:mm")</td><td>@item.VisitingUnit.Title</td><td>@(item.ExitTime.HasValue ? item.ExitTime.Value.ToString(@"hh\:mm") : "-")</td><td>@(item.IsOpen ? "حاضر" : "خارج شده")</td><td>@if(item.IsOpen && (User.IsInRole("مدیر سامانه") || User.IsInRole("اپراتور"))){<a asp-action="Exit" asp-route-id="@item.VisitId">ثبت خروج</a>}</td></tr>
+}
+</tbody></table></div>

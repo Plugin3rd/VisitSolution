@@ -1,0 +1,5 @@
+@model IEnumerable<VisitRegistry.Models.BlackListEntry>
+@inject VisitRegistry.Services.PersianDateService PersianDate
+@{ ViewData["Title"] = "بلک‌لیست"; }
+<div class="page-head"><h1>فهرست ممنوع‌الورود</h1>@if(User.IsInRole("مدیر سامانه")){<a class="button" asp-action="Create">ثبت ممنوعیت</a>}</div>
+<div class="card table-wrap"><table><thead><tr><th>شخص</th><th>شماره ملی</th><th>علت</th><th>شروع</th><th>پایان</th><th>وضعیت</th></tr></thead><tbody>@foreach(var x in Model){<tr><td>@x.Person.FirstName @x.Person.LastName</td><td>@x.Person.NationalCode</td><td>@x.Reason</td><td>@PersianDate.ToPersian(x.StartDate)</td><td>@(x.EndDate.HasValue ? PersianDate.ToPersian(x.EndDate.Value) : "بدون پایان")</td><td>@(x.IsActive ? "فعال" : "غیرفعال")</td></tr>}</tbody></table></div>

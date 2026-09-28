@@ -1,0 +1,20 @@
+@model VisitRegistry.ViewModels.VisitEntryViewModel
+@{
+    ViewData["Title"] = "ثبت مراجعه";
+    var persons = (IEnumerable<VisitRegistry.Models.Person>)ViewBag.Persons;
+    var units = (IEnumerable<VisitRegistry.Models.OrganizationalUnit>)ViewBag.Units;
+}
+<div class="page-head"><h1>ثبت ورود مراجعه‌کننده</h1><a asp-action="Index">سوابق</a></div>
+<div class="card">
+<form asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="All" class="validation"></div>
+    <label asp-for="PersonId">شخص</label>
+    <select asp-for="PersonId"><option value="">انتخاب شخص</option>@foreach(var p in persons){<option value="@p.PersonId">@p.FirstName @p.LastName - @p.NationalCode</option>}</select>
+    <label asp-for="VisitingUnitId">واحد مراجعه‌کننده</label>
+    <select asp-for="VisitingUnitId"><option value="">انتخاب واحد</option>@foreach(var u in units){<option value="@u.OrganizationalUnitId">@u.Title</option>}</select>
+    <label asp-for="EntryTime">ساعت ورود</label><input asp-for="EntryTime" type="time" />
+    <label asp-for="EntryDescription">توضیحات ورود</label><textarea asp-for="EntryDescription"></textarea>
+    <button class="button" type="submit">ثبت ورود</button>
+</form>
+</div>

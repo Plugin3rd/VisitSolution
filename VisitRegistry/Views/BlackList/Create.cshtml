@@ -1,0 +1,10 @@
+@model VisitRegistry.ViewModels.BlackListCreateViewModel
+@{ ViewData["Title"] = "ثبت ممنوعیت"; var persons=(IEnumerable<VisitRegistry.Models.Person>)ViewBag.Persons; }
+<div class="page-head"><h1>ثبت رکورد بلک‌لیست</h1><a asp-action="Index">بازگشت</a></div>
+<div class="card"><form asp-action="Create" method="post">@Html.AntiForgeryToken()<div asp-validation-summary="All" class="validation"></div>
+<label asp-for="PersonId">شخص</label><select asp-for="PersonId"><option value="">انتخاب شخص</option>@foreach(var p in persons){<option value="@p.PersonId">@p.FirstName @p.LastName - @p.NationalCode</option>}</select>
+<label asp-for="Reason"></label><textarea asp-for="Reason"></textarea><span asp-validation-for="Reason" class="validation"></span>
+<label asp-for="StartDate"></label><input asp-for="StartDate" placeholder="۱۴۰۵/۰۷/۰۶" inputmode="numeric" /><span asp-validation-for="StartDate" class="validation"></span>
+<label asp-for="EndDate"></label><input asp-for="EndDate" placeholder="۱۴۰۵/۰۷/۳۰" inputmode="numeric" /><span asp-validation-for="EndDate" class="validation"></span>
+<label class="check"><input asp-for="IsActive" /> فعال</label>
+<button class="button" type="submit">ثبت ممنوعیت</button></form></div>

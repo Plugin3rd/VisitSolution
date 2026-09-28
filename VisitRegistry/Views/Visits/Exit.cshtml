@@ -1,0 +1,14 @@
+@model VisitRegistry.ViewModels.VisitExitViewModel
+@{
+    ViewData["Title"] = "ثبت خروج";
+}
+<div class="page-head"><h1>ثبت خروج</h1><a asp-action="Index">بازگشت</a></div>
+<div class="card"><p>شخص: <strong>@ViewBag.PersonName</strong></p>
+<form asp-action="Exit" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="VisitId" />
+    <div asp-validation-summary="All" class="validation"></div>
+    <label asp-for="ExitTime">ساعت خروج</label><input asp-for="ExitTime" type="time" />
+    <label asp-for="ExitDescription">توضیحات خروج</label><textarea asp-for="ExitDescription"></textarea>
+    <button class="button" type="submit">ثبت خروج</button>
+</form></div>

@@ -1,0 +1,18 @@
+@{
+    ViewData["Title"] = "داشبورد";
+}
+<h1>داشبورد</h1>
+<div class="stats">
+    <div class="stat"><div>افراد فعال</div><strong>@ViewBag.PersonCount</strong></div>
+    <div class="stat"><div>مراجعات امروز</div><strong>@ViewBag.TodayVisits</strong></div>
+    <div class="stat"><div>افراد حاضر</div><strong>@ViewBag.OpenVisits</strong></div>
+    <div class="stat"><div>بلک‌لیست فعال</div><strong>@ViewBag.BlackListCount</strong></div>
+</div>
+<div class="card">
+    <h2>عملیات سریع</h2>
+    <div class="actions">
+        <a class="button" asp-controller="Visits" asp-action="Create">ثبت مراجعه جدید</a>
+        <a class="button secondary" asp-controller="Persons" asp-action="Create">ثبت شخص جدید</a>
+        <a class="button secondary" asp-controller="Visits" asp-action="Open">مشاهده افراد حاضر</a>
+    </div>
+</div>

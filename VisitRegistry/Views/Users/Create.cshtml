@@ -1,0 +1,10 @@
+@model VisitRegistry.ViewModels.UserCreateViewModel
+@using Microsoft.AspNetCore.Identity
+@{ ViewData["Title"] = "ثبت کاربر"; var roles=(IEnumerable<IdentityRole>)ViewBag.Roles; }
+<div class="page-head"><h1>ثبت کاربر جدید</h1><a asp-action="Index">بازگشت</a></div>
+<div class="card"><form asp-action="Create" method="post">@Html.AntiForgeryToken()<div asp-validation-summary="All" class="validation"></div>
+<label asp-for="UserName"></label><input asp-for="UserName" autocomplete="username" />
+<label asp-for="DisplayName"></label><input asp-for="DisplayName" />
+<label asp-for="Password"></label><input asp-for="Password" autocomplete="new-password" />
+<label asp-for="Role"></label><select asp-for="Role"><option value="">انتخاب نقش</option>@foreach(var r in roles){<option value="@r.Name">@r.Name</option>}</select>
+<button class="button" type="submit">ایجاد کاربر</button></form></div>

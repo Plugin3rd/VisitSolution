@@ -1,0 +1,8 @@
+@model IEnumerable<VisitRegistry.Models.Visit>
+@{
+    ViewData["Title"] = "افراد حاضر";
+}
+<div class="page-head"><h1>افراد حاضر در مجموعه</h1><a class="button" asp-action="Create">ثبت مراجعه</a></div>
+<div class="card table-wrap"><table><thead><tr><th>شخص</th><th>شماره ملی</th><th>واحد مراجعه‌کننده</th><th>ساعت ورود</th><th>توضیحات</th><th>عملیات</th></tr></thead><tbody>
+@foreach (var item in Model){<tr><td>@item.Person.FirstName @item.Person.LastName</td><td>@item.Person.NationalCode</td><td>@item.VisitingUnit.Title</td><td>@item.EntryTime.ToString(@"hh\:mm")</td><td>@item.EntryDescription</td><td><a asp-action="Exit" asp-route-id="@item.VisitId">ثبت خروج</a></td></tr>}
+</tbody></table></div>

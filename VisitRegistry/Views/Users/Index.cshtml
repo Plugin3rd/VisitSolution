@@ -1,0 +1,4 @@
+@model IEnumerable<(VisitRegistry.Models.ApplicationUser User, string Role)>
+@{ ViewData["Title"] = "کاربران"; }
+<div class="page-head"><h1>کاربران و سطوح دسترسی</h1><a class="button" asp-action="Create">کاربر جدید</a></div>
+<div class="card table-wrap"><table><thead><tr><th>نام کاربری</th><th>نام نمایشی</th><th>نقش</th><th>وضعیت</th><th>آخرین ورود</th></tr></thead><tbody>@foreach(var x in Model){<tr><td>@x.User.UserName</td><td>@x.User.DisplayName</td><td>@x.Role</td><td>@(x.User.IsActive ? "فعال" : "غیرفعال")</td><td>@(x.User.LastLoginAt.HasValue ? x.User.LastLoginAt.Value.ToLocalTime().ToString("yyyy/MM/dd HH:mm") : "هنوز وارد نشده")</td></tr>}</tbody></table></div>

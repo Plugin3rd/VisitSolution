@@ -1,0 +1,46 @@
+@using VisitRegistry.Services
+@inject PersianDateService PersianDate
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] - سامانه ثبت مراجعات</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+<header class="topbar">
+    <div class="brand">سامانه ثبت مراجعات</div>
+    <div class="userbox">
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            <span>@User.Identity.Name</span>
+            <form asp-controller="Account" asp-action="Logout" method="post" class="inline">
+                @Html.AntiForgeryToken()
+                <button class="linkbutton" type="submit">خروج</button>
+            </form>
+        }
+    </div>
+</header>
+<div class="app-shell">
+    <aside class="sidebar">
+        <a asp-controller="Home" asp-action="Index">داشبورد</a>
+        <a asp-controller="Persons" asp-action="Index">اشخاص</a>
+        <a asp-controller="Visits" asp-action="Create">ثبت مراجعه</a>
+        <a asp-controller="Visits" asp-action="Open">افراد حاضر</a>
+        <a asp-controller="Visits" asp-action="Index">سوابق مراجعات</a>
+        <a asp-controller="BlackList" asp-action="Index">بلک‌لیست</a>
+        <a asp-controller="OrganizationalUnits" asp-action="Index">واحدهای سازمانی</a>
+        @if (User.IsInRole("مدیر سامانه"))
+        {
+            <a asp-controller="Users" asp-action="Index">کاربران و دسترسی‌ها</a>
+        }
+    </aside>
+    <main class="content">
+        @if (TempData["Success"] is string success) { <div class="alert success">@success</div> }
+        @if (TempData["Error"] is string error) { <div class="alert danger">@error</div> }
+        @RenderBody()
+    </main>
+</div>
+</body>
+</html>
