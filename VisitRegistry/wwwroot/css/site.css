@@ -132,7 +132,7 @@ a { color: inherit; }
 .button.secondary { background: #e8eef5; color: #17324d; }
 .button.danger { background: #b42318; color: #fff; }
 .button.full { width: 100%; margin-top: 12px; }
-.button.small { min-height: 36px; padding: 7px 10px; font-size: 13px; }
+.button.small { width: 70px; min-height: 36px; padding: 7px 10px; font-size: 13px; }
 .inline { display: inline; }
 
 .searchbar { display: flex; gap: 10px; margin-bottom: 16px; width: 100%; }
