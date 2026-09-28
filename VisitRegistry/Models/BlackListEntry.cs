@@ -6,7 +6,8 @@ public class BlackListEntry : AuditableBase
 {
     public long BlackListEntryId { get; set; }
     public int PersonId { get; set; }
-    public Person Person { get; set; } = null!;
+    // Loaded by EF after binding; forms post only PersonId.
+    public Person? Person { get; set; }
 
     [Required(ErrorMessage = "علت ممنوعیت الزامی است.")]
     [MaxLength(1000)]

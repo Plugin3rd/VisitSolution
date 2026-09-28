@@ -6,7 +6,8 @@ public class Visit : AuditableBase
 {
     public long VisitId { get; set; }
     public int PersonId { get; set; }
-    public Person Person { get; set; } = null!;
+    // Loaded by EF after binding; it is not posted by the create/exit forms.
+    public Person? Person { get; set; }
 
     [Display(Name = "تاریخ ورود")]
     public DateTime EntryDate { get; set; }
@@ -20,7 +21,8 @@ public class Visit : AuditableBase
 
     [Display(Name = "واحد مراجعه‌کننده")]
     public int VisitingUnitId { get; set; }
-    public OrganizationalUnit VisitingUnit { get; set; } = null!;
+    // Loaded by EF after binding; the form posts only VisitingUnitId.
+    public OrganizationalUnit? VisitingUnit { get; set; }
 
     [Display(Name = "تاریخ خروج")]
     public DateTime? ExitDate { get; set; }

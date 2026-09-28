@@ -13,7 +13,14 @@
     <label asp-for="NationalCode"></label><input asp-for="NationalCode" inputmode="numeric" /><span asp-validation-for="NationalCode" class="validation"></span>
     <label asp-for="Mobile"></label><input asp-for="Mobile" inputmode="tel" /><span asp-validation-for="Mobile" class="validation"></span>
     <label asp-for="OrganizationalUnitId"></label>
-    <select asp-for="OrganizationalUnitId"><option value="">انتخاب کنید</option>@foreach(var u in units){<option value="@u.OrganizationalUnitId">@u.Title</option>}</select>
+    <select asp-for="OrganizationalUnitId">
+        <option value="0">انتخاب کنید</option>
+        @foreach (var u in units)
+        {
+            <option value="@u.OrganizationalUnitId">@u.Title</option>
+        }
+    </select>
+    <span asp-validation-for="OrganizationalUnitId" class="validation"></span>
     <label class="check"><input asp-for="IsActive" /> فعال</label>
     <button class="button" type="submit">ثبت اطلاعات</button>
 </form>
