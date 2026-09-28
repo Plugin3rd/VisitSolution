@@ -131,11 +131,33 @@ public class VisitsController(ApplicationDbContext db, VisitService visits) : Co
         return RedirectToAction(nameof(Index));
     }
 
-    public async Task<IActionResult> Open()
+    public async Task<IActionResult> Open(string? search)
     {
-        var visits = await db.Visits.Include(x => x.Person).Include(x => x.VisitingUnit)
+        search = search?.Trim();
+
+        var query = db.Visits
+            .Include(x => x.Person)
+            .Include(x => x.VisitingUnit)
             .Where(x => x.ExitDate == null && x.ExitTime == null)
-            .OrderBy(x => x.EntryTime).AsNoTracking().ToListAsync();
+            .AsNoTracking();
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var normalizedSearch = NormalizeDigits(search);
+
+            query = query.Where(x =>
+                x.Person.FirstName.Contains(search) ||
+                x.Person.LastName.Contains(search) ||
+                x.Person.NationalCode.Contains(normalizedSearch) ||
+                x.Person.Mobile.Contains(normalizedSearch) ||
+                x.VisitingUnit.Title.Contains(search) ||
+                (x.EntryDescription != null && x.EntryDescription.Contains(search)));
+        }
+
+        var visits = await query
+            .OrderBy(x => x.EntryTime)
+            .ToListAsync();
+
         return View(visits);
     }
 

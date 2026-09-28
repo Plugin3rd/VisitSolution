@@ -10,7 +10,26 @@ namespace VisitRegistry.Controllers;
 [Authorize]
 public class OrganizationalUnitsController(ApplicationDbContext db, ICurrentUserService currentUser, AuditService audit) : Controller
 {
-    public async Task<IActionResult> Index() => View(await db.OrganizationalUnits.AsNoTracking().OrderBy(x => x.Title).ToListAsync());
+    public async Task<IActionResult> Index(string? search)
+    {
+        search = search?.Trim();
+
+        var query = db.OrganizationalUnits.AsNoTracking();
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            query = query.Where(x =>
+                x.Title.Contains(search) ||
+                (x.Code != null && x.Code.Contains(search)) ||
+                (x.Description != null && x.Description.Contains(search)));
+        }
+
+        var units = await query
+            .OrderBy(x => x.Title)
+            .ToListAsync();
+
+        return View(units);
+    }
 
     [Authorize(Roles = "مدیر سامانه")]
     public IActionResult Create() => View(new OrganizationalUnit());

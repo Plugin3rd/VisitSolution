@@ -1,4 +1,12 @@
 @model IEnumerable<(VisitRegistry.Models.ApplicationUser User, string Role)>
 @{ ViewData["Title"] = "کاربران"; }
 <div class="page-head"><h1>کاربران و سطوح دسترسی</h1><a class="button" asp-action="Create">کاربر جدید</a></div>
+<form method="get" class="searchbar">
+    <input name="search" value="@Context.Request.Query["search"]" placeholder="نام کاربری، نام نمایشی، نقش یا وضعیت" />
+    <button class="button secondary" type="submit">جستجو</button>
+    @if (!string.IsNullOrWhiteSpace(Context.Request.Query["search"]))
+    {
+        <a class="button secondary" asp-action="Index">پاک کردن</a>
+    }
+</form>
 <div class="card table-wrap"><table class="responsive-table"><thead><tr><th>نام کاربری</th><th>نام نمایشی</th><th>نقش</th><th>وضعیت</th><th>آخرین ورود</th><th>عملیات</th></tr></thead><tbody>@foreach(var x in Model){<tr><td data-label="نام کاربری">@x.User.UserName</td><td data-label="نام نمایشی">@x.User.DisplayName</td><td data-label="نقش">@x.Role</td><td data-label="وضعیت">@(x.User.IsActive ? "فعال" : "غیرفعال")</td><td data-label="آخرین ورود">@(x.User.LastLoginAt.HasValue ? x.User.LastLoginAt.Value.ToLocalTime().ToString("yyyy/MM/dd HH:mm") : "هنوز وارد نشده")</td><td class="actions" data-label="عملیات"><a class="button small secondary" asp-action="Edit" asp-route-id="@x.User.Id">ویرایش</a>@if(x.User.Id != User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value){<form asp-action="Delete" asp-route-id="@x.User.Id" method="post" class="inline" onsubmit="return confirm('آیا از حذف این کاربر مطمئن هستید؟');">@Html.AntiForgeryToken()<button type="submit" class="button small danger">حذف</button></form>}</td></tr>} </tbody></table></div>

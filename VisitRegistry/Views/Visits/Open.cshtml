@@ -3,6 +3,14 @@
     ViewData["Title"] = "افراد حاضر";
 }
 <div class="page-head"><h1>افراد حاضر در مجموعه</h1><a class="button" asp-action="Create">ثبت مراجعه</a></div>
+<form method="get" class="searchbar">
+    <input name="search" value="@Context.Request.Query["search"]" placeholder="نام، نام خانوادگی، شماره ملی، موبایل، واحد یا توضیحات ورود" />
+    <button class="button secondary" type="submit">جستجو</button>
+    @if (!string.IsNullOrWhiteSpace(Context.Request.Query["search"]))
+    {
+        <a class="button secondary" asp-action="Open">پاک کردن</a>
+    }
+</form>
 <div class="card table-wrap"><table class="responsive-table"><thead><tr><th>شخص</th><th>شماره ملی</th><th>واحد مراجعه‌کننده</th><th>ساعت ورود</th><th>توضیحات</th><th>عملیات</th></tr></thead><tbody>
-@foreach (var item in Model){<tr><td data-label="شخص">@item.Person.FirstName @item.Person.LastName</td><td data-label="شماره ملی">@item.Person.NationalCode</td><td data-label="واحد مراجعه‌کننده">@item.VisitingUnit.Title</td><td data-label="ساعت ورود">@item.EntryTime.ToString(@"hh\:mm")</td><td data-label="توضیحات">@item.EntryDescription</td><td data-label="عملیات"><a asp-action="Exit" asp-route-id="@item.VisitId">ثبت خروج</a></td></tr>}
+@foreach (var item in Model){<tr><td data-label="شخص">@item.Person.FirstName @item.Person.LastName</td><td data-label="شماره ملی">@item.Person.NationalCode</td><td data-label="واحد مراجعه‌کننده">@item.VisitingUnit.Title</td><td data-label="ساعت ورود">@item.EntryTime.ToString(@"hh\:mm")</td><td data-label="توضیحات">@item.EntryDescription</td><td data-label="عملیات"><a class="button small" asp-action="Exit" asp-route-id="@item.VisitId">ثبت خروج</a></td></tr>}
 </tbody></table></div>

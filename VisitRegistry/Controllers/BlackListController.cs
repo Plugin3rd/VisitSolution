@@ -11,7 +11,32 @@ namespace VisitRegistry.Controllers;
 [Authorize]
 public class BlackListController(ApplicationDbContext db, ICurrentUserService currentUser, AuditService audit, PersianDateService persianDate) : Controller
 {
-    public async Task<IActionResult> Index() => View(await db.BlackLists.Include(x => x.Person).AsNoTracking().OrderByDescending(x => x.StartDate).ToListAsync());
+    public async Task<IActionResult> Index(string? search)
+    {
+        search = search?.Trim();
+
+        var query = db.BlackLists
+            .Include(x => x.Person)
+            .AsNoTracking();
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var normalizedSearch = NormalizeDigits(search);
+
+            query = query.Where(x =>
+                x.Person.FirstName.Contains(search) ||
+                x.Person.LastName.Contains(search) ||
+                x.Person.NationalCode.Contains(normalizedSearch) ||
+                x.Person.Mobile.Contains(normalizedSearch) ||
+                x.Reason.Contains(search));
+        }
+
+        var items = await query
+            .OrderByDescending(x => x.StartDate)
+            .ToListAsync();
+
+        return View(items);
+    }
 
     [Authorize(Roles = "مدیر سامانه")]
     public async Task<IActionResult> Create()
@@ -148,4 +173,28 @@ public class BlackListController(ApplicationDbContext db, ICurrentUserService cu
 
     private async Task LoadPersonsAsync() =>
         ViewBag.Persons = await db.Persons.Where(x => x.IsActive).OrderBy(x => x.LastName).ThenBy(x => x.FirstName).ToListAsync();
+
+    private static string NormalizeDigits(string value)
+    {
+        const string persian = "۰۱۲۳۴۵۶۷۸۹";
+        const string arabic = "٠١٢٣٤٥٦٧٨٩";
+        const string latin = "0123456789";
+
+        var chars = value.ToCharArray();
+        for (var i = 0; i < chars.Length; i++)
+        {
+            var p = persian.IndexOf(chars[i]);
+            if (p >= 0)
+            {
+                chars[i] = latin[p];
+                continue;
+            }
+
+            var a = arabic.IndexOf(chars[i]);
+            if (a >= 0)
+                chars[i] = latin[a];
+        }
+
+        return new string(chars);
+    }
 }

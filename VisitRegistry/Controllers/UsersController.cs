@@ -11,15 +11,41 @@ namespace VisitRegistry.Controllers;
 [Authorize(Roles = "مدیر سامانه")]
 public class UsersController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, ICurrentUserService currentUser, AuditService audit) : Controller
 {
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(string? search)
     {
-        var users = userManager.Users.OrderBy(x => x.UserName).ToList();
+        search = search?.Trim();
+
+        var users = await userManager.Users
+            .OrderBy(x => x.UserName)
+            .ToListAsync();
+
         var rows = new List<(ApplicationUser User, string Role)>();
+
         foreach (var user in users)
         {
             var roles = await userManager.GetRolesAsync(user);
-            rows.Add((user, roles.FirstOrDefault() ?? "بدون نقش"));
+            var role = roles.FirstOrDefault() ?? "بدون نقش";
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var statusMatches =
+                    search.Equals("فعال", StringComparison.OrdinalIgnoreCase) ? user.IsActive :
+                    search.Equals("غیرفعال", StringComparison.OrdinalIgnoreCase) ? !user.IsActive :
+                    false;
+
+                var matches =
+                    (user.UserName?.Contains(search, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                    (user.DisplayName?.Contains(search, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                    role.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                    statusMatches;
+
+                if (!matches)
+                    continue;
+            }
+
+            rows.Add((user, role));
         }
+
         return View(rows);
     }
 
