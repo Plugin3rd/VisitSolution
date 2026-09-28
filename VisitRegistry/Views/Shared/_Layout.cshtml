@@ -10,7 +10,10 @@
 </head>
 <body>
 <header class="topbar">
-    <div class="brand">سامانه ثبت مراجعات</div>
+    <div class="topbar-right">
+        <button type="button" class="menu-toggle" id="menu-toggle" aria-label="نمایش منو" aria-expanded="false" aria-controls="main-sidebar">☰</button>
+        <div class="brand">سامانه ثبت مراجعات</div>
+    </div>
     <div class="userbox">
         @if (User.Identity?.IsAuthenticated == true)
         {
@@ -23,7 +26,9 @@
     </div>
 </header>
 <div class="app-shell">
-    <aside class="sidebar">
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+    <aside class="sidebar" id="main-sidebar">
+        <button type="button" class="sidebar-close" id="sidebar-close" aria-label="بستن منو">×</button>
         <a asp-controller="Home" asp-action="Index">داشبورد</a>
         <a asp-controller="Persons" asp-action="Index">اشخاص</a>
         <a asp-controller="Visits" asp-action="Create">ثبت مراجعه</a>
@@ -41,7 +46,8 @@
         @if (TempData["Error"] is string error) { <div class="alert danger">@error</div> }
         @RenderBody()
     </main>
-    @await RenderSectionAsync("Scripts", required: false)
 </div>
+<script src="~/js/site.js" asp-append-version="true"></script>
+@await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
