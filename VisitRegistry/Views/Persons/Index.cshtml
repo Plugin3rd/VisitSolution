@@ -1,12 +1,12 @@
 @model IEnumerable<VisitRegistry.Models.Person>
-@{
-    ViewData["Title"] = "اشخاص";
-}
-<div class="page-head"><h1>فهرست اشخاص</h1><a class="button" asp-action="Create">شخص جدید</a></div>
+@{ ViewData["Title"] = "اشخاص"; }
+<div class="page-head"><h1>فهرست اشخاص</h1>@if(User.IsInRole("مدیر سامانه") || User.IsInRole("اپراتور")){<a class="button" asp-action="Create">شخص جدید</a>}</div>
 <form method="get" class="searchbar"><input name="search" value="@Context.Request.Query["search"]" placeholder="نام، نام خانوادگی، شماره ملی یا موبایل" /><button class="button secondary">جستجو</button></form>
-<div class="card table-wrap"><table><thead><tr><th>نام</th><th>نام خانوادگی</th><th>شماره ملی</th><th>موبایل</th><th>واحد</th><th>وضعیت</th></tr></thead><tbody>
+<div class="card table-wrap"><table><thead><tr><th>نام</th><th>نام خانوادگی</th><th>شماره ملی</th><th>موبایل</th><th>واحد</th><th>وضعیت</th>@if(User.IsInRole("مدیر سامانه") || User.IsInRole("اپراتور")){<th>عملیات</th>}</tr></thead><tbody>
 @foreach (var item in Model)
 {
-<tr><td>@item.FirstName</td><td>@item.LastName</td><td>@item.NationalCode</td><td>@item.Mobile</td><td>@item.OrganizationalUnit.Title</td><td>@(item.IsActive ? "فعال" : "غیرفعال")</td></tr>
+<tr><td>@item.FirstName</td><td>@item.LastName</td><td>@item.NationalCode</td><td>@item.Mobile</td><td>@item.OrganizationalUnit?.Title</td><td>@(item.IsActive ? "فعال" : "غیرفعال")</td>
+@if(User.IsInRole("مدیر سامانه") || User.IsInRole("اپراتور")){<td class="actions"><a class="button small secondary" asp-action="Edit" asp-route-id="@item.PersonId">ویرایش</a>@if(User.IsInRole("مدیر سامانه")){<form asp-action="Delete" asp-route-id="@item.PersonId" method="post" class="inline" onsubmit="return confirm('آیا از حذف این شخص مطمئن هستید؟');">@Html.AntiForgeryToken()<button type="submit" class="button small danger">حذف</button></form>}</td>}
+</tr>
 }
 </tbody></table></div>

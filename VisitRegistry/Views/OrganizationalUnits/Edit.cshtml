@@ -1,0 +1,12 @@
+@model VisitRegistry.Models.OrganizationalUnit
+@{ ViewData["Title"] = "ویرایش واحد سازمانی"; }
+<div class="page-head"><h1>ویرایش واحد سازمانی</h1><a asp-action="Index">بازگشت</a></div>
+<div class="card"><form asp-action="Edit" method="post">@Html.AntiForgeryToken()
+<input type="hidden" asp-for="OrganizationalUnitId" />
+<input type="hidden" asp-for="RecordVersion" />
+<div asp-validation-summary="All" class="validation"></div>
+<label asp-for="Title"></label><input asp-for="Title" /><span asp-validation-for="Title" class="validation"></span>
+<label asp-for="Code"></label><input asp-for="Code" />
+<label asp-for="Description"></label><textarea asp-for="Description"></textarea>
+<label class="check"><input asp-for="IsActive" /> فعال</label>
+<button class="button" type="submit">ذخیره تغییرات</button></form></div>

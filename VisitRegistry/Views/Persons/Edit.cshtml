@@ -1,0 +1,29 @@
+@model VisitRegistry.Models.Person
+@{
+    ViewData["Title"] = "ویرایش شخص";
+    var units = (IEnumerable<VisitRegistry.Models.OrganizationalUnit>)ViewBag.Units;
+}
+<div class="page-head"><h1>ویرایش شخص</h1><a asp-action="Index">بازگشت</a></div>
+<div class="card form-grid">
+<form asp-action="Edit" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="PersonId" />
+    <input type="hidden" asp-for="RecordVersion" />
+    <div asp-validation-summary="All" class="validation"></div>
+    <label asp-for="FirstName"></label><input asp-for="FirstName" /><span asp-validation-for="FirstName" class="validation"></span>
+    <label asp-for="LastName"></label><input asp-for="LastName" /><span asp-validation-for="LastName" class="validation"></span>
+    <label asp-for="NationalCode"></label><input asp-for="NationalCode" inputmode="numeric" /><span asp-validation-for="NationalCode" class="validation"></span>
+    <label asp-for="Mobile"></label><input asp-for="Mobile" inputmode="tel" /><span asp-validation-for="Mobile" class="validation"></span>
+    <label asp-for="OrganizationalUnitId"></label>
+    <select asp-for="OrganizationalUnitId">
+        <option value="0">انتخاب کنید</option>
+        @foreach (var u in units)
+        {
+            <option value="@u.OrganizationalUnitId">@u.Title</option>
+        }
+    </select>
+    <span asp-validation-for="OrganizationalUnitId" class="validation"></span>
+    <label class="check"><input asp-for="IsActive" /> فعال</label>
+    <button class="button" type="submit">ذخیره تغییرات</button>
+</form>
+</div>

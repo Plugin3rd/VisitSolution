@@ -1,0 +1,15 @@
+@model VisitRegistry.ViewModels.BlackListEditViewModel
+@using VisitRegistry.Models
+@{ ViewData["Title"] = "ویرایش ممنوعیت"; var persons=(IEnumerable<Person>)ViewBag.Persons; }
+<div class="page-head"><h1>ویرایش رکورد بلک‌لیست</h1><a asp-action="Index">بازگشت</a></div>
+<div class="card"><form asp-action="Edit" method="post">@Html.AntiForgeryToken()
+<input type="hidden" asp-for="BlackListEntryId" />
+<input type="hidden" asp-for="RecordVersion" />
+<div asp-validation-summary="All" class="validation"></div>
+<label asp-for="PersonId">شخص</label><select asp-for="PersonId"><option value="">انتخاب شخص</option>@foreach(var p in persons){<option value="@p.PersonId">@p.FirstName @p.LastName - @p.NationalCode</option>}</select>
+<span asp-validation-for="PersonId" class="validation"></span>
+<label asp-for="Reason"></label><textarea asp-for="Reason"></textarea><span asp-validation-for="Reason" class="validation"></span>
+<label asp-for="StartDate"></label><input asp-for="StartDate" placeholder="۱۴۰۵/۰۷/۰۶" inputmode="numeric" /><span asp-validation-for="StartDate" class="validation"></span>
+<label asp-for="EndDate"></label><input asp-for="EndDate" placeholder="۱۴۰۵/۰۷/۳۰" inputmode="numeric" /><span asp-validation-for="EndDate" class="validation"></span>
+<label class="check"><input asp-for="IsActive" /> فعال</label>
+<button class="button" type="submit">ذخیره تغییرات</button></form></div>

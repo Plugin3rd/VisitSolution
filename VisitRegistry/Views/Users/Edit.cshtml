@@ -1,0 +1,12 @@
+@model VisitRegistry.ViewModels.UserEditViewModel
+@using Microsoft.AspNetCore.Identity
+@{ ViewData["Title"] = "ویرایش کاربر"; var roles=(IEnumerable<IdentityRole>)ViewBag.Roles; }
+<div class="page-head"><h1>ویرایش کاربر</h1><a asp-action="Index">بازگشت</a></div>
+<div class="card"><form asp-action="Edit" method="post">@Html.AntiForgeryToken()
+<div asp-validation-summary="All" class="validation"></div>
+<label asp-for="UserName"></label><input asp-for="UserName" autocomplete="username" /><span asp-validation-for="UserName" class="validation"></span>
+<label asp-for="DisplayName"></label><input asp-for="DisplayName" /><span asp-validation-for="DisplayName" class="validation"></span>
+<label asp-for="Password"></label><input asp-for="Password" autocomplete="new-password" placeholder="در صورت نیاز وارد کنید" /><span asp-validation-for="Password" class="validation"></span>
+<label asp-for="Role"></label><select asp-for="Role"><option value="">انتخاب نقش</option>@foreach(var r in roles){<option value="@r.Name">@r.Name</option>}</select><span asp-validation-for="Role" class="validation"></span>
+<label class="check"><input asp-for="IsActive" /> فعال</label>
+<button class="button" type="submit">ذخیره تغییرات</button></form></div>
