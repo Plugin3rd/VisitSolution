@@ -41,6 +41,7 @@
         @if (TempData["Error"] is string error) { <div class="alert danger">@error</div> }
         @RenderBody()
     </main>
+    @await RenderSectionAsync("Scripts", required: false)
 </div>
 </body>
 </html>

@@ -4,7 +4,7 @@ namespace VisitRegistry.ViewModels;
 
 public class VisitEntryViewModel
 {
-    [Required(ErrorMessage = "انتخاب شخص الزامی است.")]
+    [Range(1, int.MaxValue, ErrorMessage = "انتخاب شخص الزامی است.")]
     public int PersonId { get; set; }
 
     [Required(ErrorMessage = "انتخاب واحد مراجعه‌کننده الزامی است.")]

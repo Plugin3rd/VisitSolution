@@ -24,9 +24,52 @@ public class VisitsController(ApplicationDbContext db, VisitService visits) : Co
     [Authorize(Roles = "مدیر سامانه,اپراتور")]
     public async Task<IActionResult> Create()
     {
-        ViewBag.Persons = await db.Persons.Where(x => x.IsActive).OrderBy(x => x.LastName).ThenBy(x => x.FirstName).ToListAsync();
-        ViewBag.Units = await db.OrganizationalUnits.Where(x => x.IsActive).OrderBy(x => x.Title).ToListAsync();
+        ViewBag.Units = await db.OrganizationalUnits
+            .Where(x => x.IsActive)
+            .OrderBy(x => x.Title)
+            .ToListAsync();
+
         return View(new VisitEntryViewModel());
+    }
+
+    [HttpGet]
+    [Authorize(Roles = "مدیر سامانه,اپراتور")]
+    public async Task<IActionResult> SearchPersons(string? term)
+    {
+        term = term?.Trim();
+        if (string.IsNullOrWhiteSpace(term))
+            return Json(Array.Empty<object>());
+
+        term = NormalizeDigits(term);
+
+        var query = db.Persons
+            .Where(x => x.IsActive)
+            .AsNoTracking();
+
+        if (term.Length >= 2)
+        {
+            query = query.Where(x =>
+                x.FirstName.Contains(term) ||
+                x.LastName.Contains(term) ||
+                x.NationalCode.Contains(term) ||
+                x.Mobile.Contains(term));
+        }
+
+        var persons = await query
+            .OrderBy(x => x.LastName)
+            .ThenBy(x => x.FirstName)
+            .Take(30)
+            .Select(x => new
+            {
+                id = x.PersonId,
+                name = x.FirstName + " " + x.LastName,
+                nationalCode = x.NationalCode,
+                mobile = x.Mobile,
+                unit = x.OrganizationalUnit != null ? x.OrganizationalUnit.Title : ""
+            })
+            .ToListAsync();
+
+        return Json(persons);
     }
 
     [HttpPost]
@@ -36,8 +79,10 @@ public class VisitsController(ApplicationDbContext db, VisitService visits) : Co
     {
         if (!ModelState.IsValid)
         {
-            ViewBag.Persons = await db.Persons.Where(x => x.IsActive).OrderBy(x => x.LastName).ThenBy(x => x.FirstName).ToListAsync();
-            ViewBag.Units = await db.OrganizationalUnits.Where(x => x.IsActive).OrderBy(x => x.Title).ToListAsync();
+            ViewBag.Units = await db.OrganizationalUnits
+                .Where(x => x.IsActive)
+                .OrderBy(x => x.Title)
+                .ToListAsync();
             return View(model);
         }
 
@@ -45,8 +90,10 @@ public class VisitsController(ApplicationDbContext db, VisitService visits) : Co
         if (error is not null)
         {
             ModelState.AddModelError(string.Empty, error);
-            ViewBag.Persons = await db.Persons.Where(x => x.IsActive).OrderBy(x => x.LastName).ThenBy(x => x.FirstName).ToListAsync();
-            ViewBag.Units = await db.OrganizationalUnits.Where(x => x.IsActive).OrderBy(x => x.Title).ToListAsync();
+            ViewBag.Units = await db.OrganizationalUnits
+                .Where(x => x.IsActive)
+                .OrderBy(x => x.Title)
+                .ToListAsync();
             return View(model);
         }
 
@@ -90,5 +137,29 @@ public class VisitsController(ApplicationDbContext db, VisitService visits) : Co
             .Where(x => x.ExitDate == null && x.ExitTime == null)
             .OrderBy(x => x.EntryTime).AsNoTracking().ToListAsync();
         return View(visits);
+    }
+
+    private static string NormalizeDigits(string value)
+    {
+        const string persian = "۰۱۲۳۴۵۶۷۸۹";
+        const string arabic = "٠١٢٣٤٥٦٧٨٩";
+        const string latin = "0123456789";
+
+        var chars = value.ToCharArray();
+        for (var i = 0; i < chars.Length; i++)
+        {
+            var p = persian.IndexOf(chars[i]);
+            if (p >= 0)
+            {
+                chars[i] = latin[p];
+                continue;
+            }
+
+            var a = arabic.IndexOf(chars[i]);
+            if (a >= 0)
+                chars[i] = latin[a];
+        }
+
+        return new string(chars);
     }
 }
