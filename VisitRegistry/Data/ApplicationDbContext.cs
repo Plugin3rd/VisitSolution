@@ -14,6 +14,29 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<BlackListEntry> BlackLists => Set<BlackListEntry>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
 
+    public override int SaveChanges(bool acceptAllChangesOnSuccess)
+    {
+        UpdateRecordVersions();
+        return base.SaveChanges(acceptAllChangesOnSuccess);
+    }
+
+    public override Task<int> SaveChangesAsync(
+        bool acceptAllChangesOnSuccess,
+        CancellationToken cancellationToken = default)
+    {
+        UpdateRecordVersions();
+        return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+    }
+
+    private void UpdateRecordVersions()
+    {
+        foreach (var entry in ChangeTracker.Entries<AuditableBase>()
+                     .Where(entry => entry.State is EntityState.Added or EntityState.Modified))
+        {
+            entry.Entity.RecordVersion = Guid.NewGuid().ToByteArray();
+        }
+    }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -21,7 +44,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         modelBuilder.Entity<Person>(entity =>
         {
             entity.HasIndex(x => x.NationalCode).IsUnique();
-            entity.Property(x => x.RecordVersion).IsRowVersion();
+            entity.Property(x => x.RecordVersion).IsConcurrencyToken();
             entity.HasOne(x => x.OrganizationalUnit)
                 .WithMany(x => x.Persons)
                 .HasForeignKey(x => x.OrganizationalUnitId)
@@ -31,12 +54,12 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         modelBuilder.Entity<OrganizationalUnit>(entity =>
         {
             entity.HasIndex(x => x.Title).IsUnique();
-            entity.Property(x => x.RecordVersion).IsRowVersion();
+            entity.Property(x => x.RecordVersion).IsConcurrencyToken();
         });
 
         modelBuilder.Entity<Visit>(entity =>
         {
-            entity.Property(x => x.RecordVersion).IsRowVersion();
+            entity.Property(x => x.RecordVersion).IsConcurrencyToken();
             entity.HasOne(x => x.Person)
                 .WithMany(x => x.Visits)
                 .HasForeignKey(x => x.PersonId)
@@ -50,7 +73,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 
         modelBuilder.Entity<BlackListEntry>(entity =>
         {
-            entity.Property(x => x.RecordVersion).IsRowVersion();
+            entity.Property(x => x.RecordVersion).IsConcurrencyToken();
             entity.HasOne(x => x.Person)
                 .WithMany(x => x.BlackListEntries)
                 .HasForeignKey(x => x.PersonId)

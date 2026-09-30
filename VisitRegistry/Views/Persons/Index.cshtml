@@ -1,12 +1,97 @@
 @model IEnumerable<VisitRegistry.Models.Person>
+@using VisitRegistry.Services
+@inject PersianDateService PersianDate
 @{ ViewData["Title"] = "اشخاص"; }
-<div class="page-head"><h1>فهرست اشخاص</h1>@if(User.IsInRole("مدیر سامانه") || User.IsInRole("اپراتور")){<a class="button" asp-action="Create">شخص جدید</a>}</div>
-<form method="get" class="searchbar"><input name="search" value="@Context.Request.Query["search"]" placeholder="نام، نام خانوادگی، شماره ملی یا موبایل" /><button class="button secondary">جستجو</button></form>
-<div class="card table-wrap"><table class="responsive-table"><thead><tr><th>نام</th><th>نام خانوادگی</th><th>شماره ملی</th><th>موبایل</th><th>واحد</th><th>وضعیت</th>@if(User.IsInRole("مدیر سامانه") || User.IsInRole("اپراتور")){<th>عملیات</th>}</tr></thead><tbody>
-@foreach (var item in Model)
-{
-<tr><td data-label="نام">@item.FirstName</td><td data-label="نام خانوادگی">@item.LastName</td><td data-label="شماره ملی">@item.NationalCode</td><td data-label="موبایل">@item.Mobile</td><td data-label="واحد">@item.OrganizationalUnit?.Title</td><td data-label="وضعیت">@(item.IsActive ? "فعال" : "غیرفعال")</td>
-@if(User.IsInRole("مدیر سامانه") || User.IsInRole("اپراتور")){<td class="actions" data-label="عملیات"><a class="button small secondary" asp-action="Edit" asp-route-id="@item.PersonId">ویرایش</a>@if(User.IsInRole("مدیر سامانه")){<form asp-action="Delete" asp-route-id="@item.PersonId" method="post" class="inline" onsubmit="return confirm('آیا از حذف این شخص مطمئن هستید؟');">@Html.AntiForgeryToken()<button type="submit" class="button small danger">حذف</button></form>}</td>}
-</tr>
-}
-</tbody></table></div>
+<div class="page-head">
+    <div class="page-title">
+        <span class="page-title-icon" aria-hidden="true"><svg><use href="#i-users"></use></svg></span>
+        <div>
+            <h1>فهرست اشخاص</h1>
+            <p class="subtitle">مدیریت اشخاص ثبت‌شده در سامانه کنترل تردد</p>
+        </div>
+    </div>
+    @if (User.IsInRole("مدیر سامانه") || User.IsInRole("اپراتور"))
+    {
+        <a class="button" asp-action="Create"><svg aria-hidden="true"><use href="#i-user-plus"></use></svg> شخص جدید</a>
+    }
+</div>
+
+@await Html.PartialAsync("_SearchBar", "نام، نام خانوادگی، شماره ملی یا موبایل")
+
+<div class="card flush">
+    <div class="table-toolbar">
+        <span class="count js-row-count"></span>
+        <div class="search-field table-search js-table-search">
+            <svg class="search-icon" aria-hidden="true"><use href="#i-search"></use></svg>
+            <input type="search" placeholder="فیلتر سریع در همین صفحه" aria-label="فیلتر سریع جدول" autocomplete="off" />
+            <button type="button" class="clear-search" aria-label="پاک کردن فیلتر">
+                <svg style="width:14px;height:14px" aria-hidden="true"><use href="#i-x"></use></svg>
+            </button>
+        </div>
+    </div>
+
+    <div class="table-wrap">
+        <table class="responsive-table" data-table>
+            <thead>
+                <tr>
+                    <th class="sortable">نام</th>
+                    <th class="sortable">نام خانوادگی</th>
+                    <th class="sortable">شماره ملی</th>
+                    <th>موبایل</th>
+                    <th>واحد سازمانی</th>
+                    <th>وضعیت</th>
+                    @if (User.IsInRole("مدیر سامانه") || User.IsInRole("اپراتور"))
+                    {
+                        <th>عملیات</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td data-label="نام">@item.FirstName</td>
+                        <td data-label="نام خانوادگی">@item.LastName</td>
+                        <td data-label="شماره ملی"><span class="mono">@item.NationalCode</span></td>
+                        <td data-label="موبایل"><span class="mono">@item.Mobile</span></td>
+                        <td data-label="واحد سازمانی">@(item.OrganizationalUnit?.Title ?? "—")</td>
+                        <td data-label="وضعیت">
+                            @if (item.IsActive)
+                            {
+                                <span class="badge success">فعال</span>
+                            }
+                            else
+                            {
+                                <span class="badge danger">غیرفعال</span>
+                            }
+                        </td>
+                        @if (User.IsInRole("مدیر سامانه") || User.IsInRole("اپراتور"))
+                        {
+                            <td class="actions" data-label="عملیات">
+                                <a class="button small secondary" asp-action="Edit" asp-route-id="@item.PersonId" title="ویرایش">
+                                    <svg aria-hidden="true"><use href="#i-edit"></use></svg> ویرایش
+                                </a>
+                                @if (User.IsInRole("مدیر سامانه"))
+                                {
+                                    <form asp-action="Delete" asp-route-id="@item.PersonId" method="post" class="inline" data-confirm="آیا از حذف این شخص مطمئن هستید؟ این عمل بازگشت‌پذیر نیست.">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="button small soft-danger" title="حذف">
+                                            <svg aria-hidden="true"><use href="#i-trash"></use></svg> حذف
+                                        </button>
+                                    </form>
+                                }
+                            </td>
+                        }
+                    </tr>
+                }
+                <tr data-empty-row hidden>
+                    <td colspan="7">
+                        <partial name="_EmptyState" model="@("هیچ شخصی یافت نشد. عبارت جستجو را تغییر دهید یا شخص جدیدی ثبت کنید.")" />
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <partial name="_TablePager" />
+</div>

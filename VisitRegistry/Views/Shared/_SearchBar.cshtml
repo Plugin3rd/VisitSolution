@@ -1,0 +1,18 @@
+@* نوار جستجوی استاندارد — ورودی: متن راهنمای جستجو *@
+@model string
+<form method="get" class="searchbar" data-no-loading="1" role="search">
+    <div class="search-field">
+        <svg class="search-icon" aria-hidden="true"><use href="#i-search"></use></svg>
+        <input type="search" name="search" value="@Context.Request.Query["search"]" placeholder="@Model" aria-label="عبارت جستجو" autocomplete="off" />
+        <button type="button" class="clear-search" aria-label="پاک کردن عبارت جستجو">
+            <svg style="width:14px;height:14px" aria-hidden="true"><use href="#i-x"></use></svg>
+        </button>
+    </div>
+    <button class="button secondary" type="submit">
+        <svg aria-hidden="true"><use href="#i-search"></use></svg> جستجو
+    </button>
+    @if (!string.IsNullOrWhiteSpace(Context.Request.Query["search"]))
+    {
+        <a class="button ghost" href="@Context.Request.Path"><svg aria-hidden="true"><use href="#i-x"></use></svg> پاک کردن</a>
+    }
+</form>

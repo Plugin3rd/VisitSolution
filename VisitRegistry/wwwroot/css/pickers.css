@@ -1,0 +1,303 @@
+/* ==========================================================================
+   استایل انتخابگر تاریخ و زمان — هماهنگ با پوسته فارسی/RTL
+   Overlays for persian-datepicker and bootstrap-timepicker.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   انتخابگر تاریخ شمسی
+   -------------------------------------------------------------------------- */
+.datepicker-plot-area {
+    background: var(--bg-elevated, #fff);
+    border: 1px solid var(--border, #dfe5ee);
+    border-radius: 12px;
+    box-shadow: 0 16px 40px rgba(15, 23, 42, .18);
+    padding: 0;
+    overflow: hidden;
+    font-family: var(--font-family, "Vazirmatn", sans-serif);
+    line-height: 1.7;
+    z-index: 1060;
+}
+
+.datepicker-plot-area .datepicker-navigator {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 10px 12px;
+    background: var(--brand-600, #2563eb);
+    border: 0;
+}
+.datepicker-plot-area .datepicker-navigator .datepicker-month,
+.datepicker-plot-area .datepicker-navigator .datepicker-year {
+    color: #fff;
+    font-size: .88rem;
+    font-weight: 700;
+    min-width: 0;
+}
+.datepicker-plot-area .datepicker-navigator .pwt-btn-prev,
+.datepicker-plot-area .datepicker-navigator .pwt-btn-next {
+    width: 30px;
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    background: rgba(255, 255, 255, .14);
+    color: #fff;
+    border-radius: 8px;
+    transition: background-color 160ms ease;
+}
+.datepicker-plot-area .datepicker-navigator .pwt-btn-prev:hover,
+.datepicker-plot-area .datepicker-navigator .pwt-btn-next:hover { background: rgba(255, 255, 255, .28); }
+.datepicker-plot-area .datepicker-navigator .pwt-btn-switch { display: none; }
+.datepicker-plot-area .datepicker-navigator .pwt-btn-prev svg,
+.datepicker-plot-area .datepicker-navigator .pwt-btn-next svg { width: 15px; height: 15px; fill: currentColor; }
+
+.datepicker-plot-area .datepicker-day-view,
+.datepicker-plot-area .datepicker-month-view,
+.datepicker-plot-area .datepicker-year-view { padding: 8px; }
+.datepicker-plot-area .datepicker-day-view .table-days th {
+    color: var(--text-muted, #64748b);
+    font-size: .72rem;
+    font-weight: 700;
+    padding: 4px 0 8px;
+    background: transparent;
+    position: static;
+}
+.datepicker-plot-area .datepicker-day-view .table-days td { padding: 1px; text-align: center; }
+.datepicker-plot-area .datepicker-day-view .table-days td span {
+    width: 36px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text, #1a2233);
+    font-size: .82rem;
+    font-weight: 500;
+    border: 1px solid transparent;
+    transition: background-color 140ms ease, color 140ms ease;
+}
+.datepicker-plot-area .datepicker-day-view .table-days td:hover span {
+    background: var(--bg-hover, #f2f6fc);
+    color: var(--brand-700, #1d4fd7);
+}
+.datepicker-plot-area .datepicker-day-view .table-days td.today span {
+    border-color: var(--brand-500, #3b76f6);
+    color: var(--brand-600, #2563eb);
+    font-weight: 700;
+}
+.datepicker-plot-area .datepicker-day-view .table-days td.selected span,
+.datepicker-plot-area .datepicker-day-view .table-days td:hover span.selected {
+    background: var(--brand-600, #2563eb);
+    color: #fff;
+    font-weight: 700;
+}
+.datepicker-plot-area .datepicker-day-view .table-days td.disabled span,
+.datepicker-plot-area .datepicker-day-view .table-days td.disabled:hover span {
+    color: var(--text-subtle, #94a3b8);
+    opacity: .55;
+    cursor: not-allowed;
+    background: transparent;
+}
+.datepicker-plot-area .datepicker-day-view .table-days td span.other-month { color: var(--text-subtle, #94a3b8); }
+
+.datepicker-plot-area .datepicker-month-view .month-item,
+.datepicker-plot-area .datepicker-year-view .year-item {
+    width: 32%;
+    min-height: 40px;
+    margin: 3%;
+    padding: 6px 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    color: var(--text, #1a2233);
+    font-size: .8rem;
+    font-weight: 500;
+    border: 1px solid var(--border, #dfe5ee);
+}
+.datepicker-plot-area .datepicker-month-view .month-item:hover,
+.datepicker-plot-area .datepicker-year-view .year-item:hover { background: var(--bg-hover, #f2f6fc); }
+.datepicker-plot-area .datepicker-month-view .month-item.selected,
+.datepicker-plot-area .datepicker-year-view .year-item.selected {
+    background: var(--brand-600, #2563eb);
+    border-color: var(--brand-600, #2563eb);
+    color: #fff;
+    font-weight: 700;
+}
+.datepicker-plot-area .datepicker-month-view .month-item-disable,
+.datepicker-plot-area .datepicker-year-view .year-item-disable { color: var(--text-subtle, #94a3b8); opacity: .5; }
+
+.datepicker-plot-area .toolbox {
+    display: flex;
+    gap: 6px;
+    padding: 10px 12px;
+    border-top: 1px solid var(--border, #dfe5ee);
+    background: var(--surface-muted, #f7f9fc);
+}
+.datepicker-plot-area .toolbox .pwt-btn-today,
+.datepicker-plot-area .toolbox .pwt-btn-submit,
+.datepicker-plot-area .toolbox .pwt-btn-calendar {
+    flex: 1 1 auto;
+    height: 36px;
+    border: 1px solid var(--border-strong, #c6d0e0);
+    border-radius: 8px;
+    background: var(--bg-elevated, #fff);
+    color: var(--text, #1a2233);
+    font-size: .8rem;
+    font-weight: 600;
+    transition: background-color 160ms ease, border-color 160ms ease;
+}
+.datepicker-plot-area .toolbox .pwt-btn-today:hover,
+.datepicker-plot-area .toolbox .pwt-btn-submit:hover,
+.datepicker-plot-area .toolbox .pwt-btn-calendar:hover {
+    background: var(--brand-600, #2563eb);
+    border-color: var(--brand-600, #2563eb);
+    color: #fff;
+}
+.datepicker-plot-area .toolbox .pwt-btn-submit {
+    background: var(--brand-600, #2563eb);
+    border-color: var(--brand-600, #2563eb);
+    color: #fff;
+}
+.datepicker-plot-area .toolbox .pwt-btn-calendar { flex: 0 0 40px; }
+
+/* --------------------------------------------------------------------------
+   انتخابگر ساعت
+   -------------------------------------------------------------------------- */
+.bootstrap-timepicker-widget {
+    font-family: var(--font-family, "Vazirmatn", sans-serif);
+    direction: rtl;
+}
+.bootstrap-timepicker-widget.dropdown { margin-top: 4px; }
+.bootstrap-timepicker-widget .dropdown-menu {
+    background: var(--bg-elevated, #fff);
+    border: 1px solid var(--border, #dfe5ee);
+    border-radius: 10px;
+    box-shadow: 0 12px 32px rgba(15, 23, 42, .16);
+    padding: 9px;
+    min-width: 152px;
+    font-size: .78rem;
+    color: var(--text, #1a2233);
+    z-index: 1060;
+}
+.bootstrap-timepicker-widget .dropdown-menu:before { display: none; }
+
+.bootstrap-timepicker-widget .time {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    margin-bottom: 7px;
+    direction: rtl;
+}
+.bootstrap-timepicker-widget .time,
+.bootstrap-timepicker-widget .time:hover,
+.bootstrap-timepicker-widget .time:focus { color: var(--text, #1a2233); }
+.bootstrap-timepicker-widget .time .hh,
+.bootstrap-timepicker-widget .time .mm,
+.bootstrap-timepicker-widget .time .ss {
+    width: 38px;
+    height: 34px;
+    padding: 0;
+    border: 1px solid var(--border-strong, #c6d0e0);
+    border-radius: 7px;
+    background: var(--surface-muted, #f7f9fc);
+    color: var(--text, #1a2233);
+    font-size: .95rem;
+    font-weight: 700;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+}
+.bootstrap-timepicker-widget .time .hh:focus,
+.bootstrap-timepicker-widget .time .mm:focus,
+.bootstrap-timepicker-widget .time .ss:focus {
+    border-color: var(--brand-600, #2563eb);
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, .18);
+    background: var(--bg-elevated, #fff);
+}
+.bootstrap-timepicker-widget .time .colon { font-size: .95rem; font-weight: 700; color: var(--text-muted, #64748b); }
+.bootstrap-timepicker-widget .time .meridian { display: none; }
+
+.bootstrap-timepicker-widget .list {
+    max-height: 116px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    border-top: 1px solid var(--border, #dfe5ee);
+    padding-top: 6px;
+    text-align: center;
+}
+.bootstrap-timepicker-widget .list li {
+    cursor: pointer;
+    border-radius: 5px;
+    padding: 3px 6px;
+    margin: 1px 0;
+    color: var(--text, #1a2233);
+    transition: background-color 140ms ease;
+}
+.bootstrap-timepicker-widget .list li:hover { background: var(--bg-hover, #f2f6fc); }
+.bootstrap-timepicker-widget .list li.active,
+.bootstrap-timepicker-widget .list li:hover.active { background: var(--brand-600, #2563eb); color: #fff; }
+
+.bootstrap-timepicker-widget .ctrl {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 5px;
+    margin-top: 7px;
+}
+.bootstrap-timepicker-widget .ctrl button,
+.bootstrap-timepicker-widget .ctrl .btn {
+    height: 30px;
+    min-width: 30px;
+    padding: 0 8px;
+    border: 1px solid var(--border-strong, #c6d0e0);
+    border-radius: 7px;
+    background: var(--bg-elevated, #fff);
+    color: var(--text, #1a2233);
+    font-size: .74rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 160ms ease, border-color 160ms ease;
+}
+.bootstrap-timepicker-widget .ctrl button:hover,
+.bootstrap-timepicker-widget .ctrl .btn:hover {
+    background: var(--brand-600, #2563eb);
+    border-color: var(--brand-600, #2563eb);
+    color: #fff;
+}
+.bootstrap-timepicker-widget .ctrl .set-time { flex: 1 1 auto; }
+.bootstrap-timepicker-widget .ctrl .set-time:hover { background: var(--ok-500, #16a34a); border-color: var(--ok-500, #16a34a); }
+.bootstrap-timepicker-widget .ctrl button i { display: block; width: 12px; height: 12px; margin: 0; }
+
+/* حالت راست‌چین ورودی انتخابگر ساعت */
+.time-input { direction: ltr; text-align: center; font-variant-numeric: tabular-nums; letter-spacing: .04em; }
+
+/* آیکون تقویم در ورودی تاریخ */
+.field-with-btn { position: relative; }
+.field-with-btn input { padding-inline-end: 42px; }
+.field-with-btn .field-btn {
+    position: absolute;
+    inset-inline-end: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text-muted, #64748b);
+    cursor: pointer;
+    transition: background-color 160ms ease, color 160ms ease;
+}
+.field-with-btn .field-btn:hover { background: var(--bg-hover, #f2f6fc); color: var(--brand-600, #2563eb); }
+.field-with-btn .field-btn svg { width: 18px; height: 18px; }
+.field-with-btn input:not([readonly]):hover + .field-btn { color: var(--brand-600, #2563eb); }
+
+@media (max-width: 640px) {
+    .datepicker-plot-area .datepicker-day-view .table-days td span { width: 34px; height: 32px; }
+}

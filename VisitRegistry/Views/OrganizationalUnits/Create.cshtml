@@ -1,9 +1,48 @@
 @model VisitRegistry.Models.OrganizationalUnit
 @{ ViewData["Title"] = "ثبت واحد جدید"; }
-<div class="page-head"><h1>ثبت واحد سازمانی</h1><a asp-action="Index">بازگشت</a></div>
-<div class="card"><form asp-action="Create" method="post">@Html.AntiForgeryToken()<div asp-validation-summary="All" class="validation"></div>
-<label asp-for="Title"></label><input asp-for="Title" /><span asp-validation-for="Title" class="validation"></span>
-<label asp-for="Code"></label><input asp-for="Code" />
-<label asp-for="Description"></label><textarea asp-for="Description"></textarea>
-<label class="check"><input asp-for="IsActive" /> فعال</label>
-<button class="button" type="submit">ثبت واحد</button></form></div>
+<div class="page-head">
+    <div class="page-title">
+        <span class="page-title-icon" aria-hidden="true"><svg><use href="#i-sitemap"></use></svg></span>
+        <div>
+            <h1>ثبت واحد سازمانی</h1>
+            <p class="subtitle">افزودن واحد جدید به ساختار سازمانی</p>
+        </div>
+    </div>
+    <a asp-action="Index">بازگشت به فهرست</a>
+</div>
+
+<div class="card form-grid two">
+    <div class="card-head">
+        <h2>اطلاعات واحد</h2>
+    </div>
+
+    <form asp-action="Create" method="post">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="All" class="validation validation-summary-errors"></div>
+
+        <div class="span-2">
+            <label asp-for="Title">عنوان واحد <span class="req">*</span></label>
+            <input asp-for="Title" />
+            <span asp-validation-for="Title" class="validation"></span>
+        </div>
+
+        <div>
+            <label asp-for="Code">کد واحد</label>
+            <input asp-for="Code" maxlength="50" />
+        </div>
+
+        <div class="span-2">
+            <label asp-for="Description">توضیحات</label>
+            <textarea asp-for="Description" placeholder="توضیح کوتاهی درباره این واحد..."></textarea>
+        </div>
+
+        <div class="span-2">
+            <label class="check"><input asp-for="IsActive" /> فعال باشد</label>
+        </div>
+
+        <div class="form-actions span-2">
+            <button class="button" type="submit"><svg aria-hidden="true"><use href="#i-check"></use></svg> ثبت واحد</button>
+            <a class="button ghost" asp-action="Index">انصراف</a>
+        </div>
+    </form>
+</div>

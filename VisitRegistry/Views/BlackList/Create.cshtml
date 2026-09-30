@@ -1,10 +1,79 @@
 @model VisitRegistry.ViewModels.BlackListCreateViewModel
-@{ ViewData["Title"] = "ثبت ممنوعیت"; var persons=(IEnumerable<VisitRegistry.Models.Person>)ViewBag.Persons; }
-<div class="page-head"><h1>ثبت رکورد بلک‌لیست</h1><a asp-action="Index">بازگشت</a></div>
-<div class="card"><form asp-action="Create" method="post">@Html.AntiForgeryToken()<div asp-validation-summary="All" class="validation"></div>
-<label asp-for="PersonId">شخص</label><select asp-for="PersonId"><option value="">انتخاب شخص</option>@foreach(var p in persons){<option value="@p.PersonId">@p.FirstName @p.LastName - @p.NationalCode</option>}</select>
-<label asp-for="Reason"></label><textarea asp-for="Reason"></textarea><span asp-validation-for="Reason" class="validation"></span>
-<label asp-for="StartDate"></label><input asp-for="StartDate" placeholder="۱۴۰۵/۰۷/۰۶" inputmode="numeric" /><span asp-validation-for="StartDate" class="validation"></span>
-<label asp-for="EndDate"></label><input asp-for="EndDate" placeholder="۱۴۰۵/۰۷/۳۰" inputmode="numeric" /><span asp-validation-for="EndDate" class="validation"></span>
-<label class="check"><input asp-for="IsActive" /> فعال</label>
-<button class="button" type="submit">ثبت ممنوعیت</button></form></div>
+@using VisitRegistry.Services
+@inject PersianDateService PersianDate
+@{
+    ViewData["Title"] = "ثبت ممنوعیت";
+    var persons = (IEnumerable<VisitRegistry.Models.Person>)ViewBag.Persons;
+}
+<div class="page-head">
+    <div class="page-title">
+        <span class="page-title-icon" aria-hidden="true"><svg><use href="#i-shield-off"></use></svg></span>
+        <div>
+            <h1>ثبت رکورد بلک‌لیست</h1>
+            <p class="subtitle>ممنوع کردن ورود یک شخص به مجموعه</p>
+        </div>
+    </div>
+    <a asp-action="Index">بازگشت به فهرست</a>
+</div>
+
+<div class="card form-grid two">
+    <div class="card-head">
+        <h2>اطلاعات ممنوعیت</h2>
+    </div>
+
+    <form asp-action="Create" method="post">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="All" class="validation validation-summary-errors"></div>
+
+        <div class="span-2">
+            <label asp-for="PersonId">شخص <span class="req">*</span></label>
+            <select asp-for="PersonId">
+                <option value="">انتخاب شخص</option>
+                @foreach (var p in persons)
+                {
+                    <option value="@p.PersonId">@p.FirstName @p.LastName — @p.NationalCode</option>
+                }
+            </select>
+            <span asp-validation-for="PersonId" class="validation"></span>
+        </div>
+
+        <div class="span-2">
+            <label asp-for="Reason">علت ممنوعیت <span class="req">*</span></label>
+            <textarea asp-for="Reason" placeholder="دلیل ممنوعیت ورود این شخص را بنویسید..."></textarea>
+            <span asp-validation-for="Reason" class="validation"></span>
+        </div>
+
+        <div>
+            <label asp-for="StartDate">تاریخ شروع <span class="req">*</span></label>
+            <div class="field-with-btn">
+                <input asp-for="StartDate" data-jalali-picker data-jalali-max="@PersianDate.ToPersian(DateTime.Now.AddYears(20))" placeholder="۱۴۰۵/۰۷/۰۶" autocomplete="off" inputmode="numeric" aria-describedby="start-date-help" />
+                <button type="button" class="field-btn" aria-label="انتخاب تاریخ شروع">
+                    <svg aria-hidden="true"><use href="#i-calendar"></use></svg>
+                </button>
+            </div>
+            <span id="start-date-help" class="field-help">روز شروع اعتبار ممنوعیت</span>
+            <span asp-validation-for="StartDate" class="validation"></span>
+        </div>
+
+        <div>
+            <label asp-for="EndDate">تاریخ پایان</label>
+            <div class="field-with-btn">
+                <input asp-for="EndDate" data-jalali-picker placeholder="۱۴۰۵/۰۷/۳۰" autocomplete="off" inputmode="numeric" aria-describedby="end-date-help" />
+                <button type="button" class="field-btn" aria-label="انتخاب تاریخ پایان">
+                    <svg aria-hidden="true"><use href="#i-calendar"></use></svg>
+                </button>
+            </div>
+            <span id="end-date-help" class="field-help">خالی بگذارید تا ممنوعیت دائمی باشد</span>
+            <span asp-validation-for="EndDate" class="validation"></span>
+        </div>
+
+        <div class="span-2">
+            <label class="check"><input asp-for="IsActive" /> فعال باشد</label>
+        </div>
+
+        <div class="form-actions span-2">
+            <button class="button danger" type="submit"><svg aria-hidden="true"><use href="#i-shield-off"></use></svg> ثبت ممنوعیت</button>
+            <a class="button ghost" asp-action="Index">انصراف</a>
+        </div>
+    </form>
+</div>

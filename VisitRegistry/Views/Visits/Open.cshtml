@@ -1,16 +1,68 @@
 @model IEnumerable<VisitRegistry.Models.Visit>
+@using VisitRegistry.Services
+@inject PersianDateService PersianDate
 @{
     ViewData["Title"] = "افراد حاضر";
 }
-<div class="page-head"><h1>افراد حاضر در مجموعه</h1><a class="button" asp-action="Create">ثبت مراجعه</a></div>
-<form method="get" class="searchbar">
-    <input name="search" value="@Context.Request.Query["search"]" placeholder="نام، نام خانوادگی، شماره ملی، موبایل، واحد یا توضیحات ورود" />
-    <button class="button secondary" type="submit">جستجو</button>
-    @if (!string.IsNullOrWhiteSpace(Context.Request.Query["search"]))
-    {
-        <a class="button secondary" asp-action="Open">پاک کردن</a>
-    }
-</form>
-<div class="card table-wrap"><table class="responsive-table"><thead><tr><th>شخص</th><th>شماره ملی</th><th>واحد مراجعه‌کننده</th><th>ساعت ورود</th><th>توضیحات</th><th>عملیات</th></tr></thead><tbody>
-@foreach (var item in Model){<tr><td data-label="شخص">@item.Person.FirstName @item.Person.LastName</td><td data-label="شماره ملی">@item.Person.NationalCode</td><td data-label="واحد مراجعه‌کننده">@item.VisitingUnit.Title</td><td data-label="ساعت ورود">@item.EntryTime.ToString(@"hh\:mm")</td><td data-label="توضیحات">@item.EntryDescription</td><td data-label="عملیات"><a class="button small" asp-action="Exit" asp-route-id="@item.VisitId">ثبت خروج</a></td></tr>}
-</tbody></table></div>
+<div class="page-head">
+    <div class="page-title">
+        <span class="page-title-icon" aria-hidden="true"><svg><use href="#i-users-group"></use></svg></span>
+        <div>
+            <h1>افراد حاضر در مجموعه</h1>
+            <p class="subtitle">مراجعه‌کنندگانی که هنوز خروج آن‌ها ثبت نشده است</p>
+        </div>
+    </div>
+    <a class="button" asp-action="Create"><svg aria-hidden="true"><use href="#i-plus"></use></svg> ثبت مراجعه</a>
+</div>
+
+@await Html.PartialAsync("_SearchBar", "نام، نام خانوادگی، شماره ملی، موبایل، واحد یا توضیحات ورود")
+
+<div class="card flush">
+    <div class="table-toolbar">
+        <span class="count js-row-count"></span>
+        <div class="search-field table-search js-table-search">
+            <svg class="search-icon" aria-hidden="true"><use href="#i-search"></use></svg>
+            <input type="search" placeholder="فیلتر سریع در همین صفحه" aria-label="فیلتر سریع جدول" autocomplete="off" />
+            <button type="button" class="clear-search" aria-label="پاک کردن فیلتر">
+                <svg style="width:14px;height:14px" aria-hidden="true"><use href="#i-x"></use></svg>
+            </button>
+        </div>
+    </div>
+
+    <div class="table-wrap">
+        <table class="responsive-table" data-table>
+            <thead>
+                <tr>
+                    <th class="sortable">شخص</th>
+                    <th>شماره ملی</th>
+                    <th>واحد مراجعه‌کننده</th>
+                    <th class="sortable">ساعت ورود</th>
+                    <th>توضیحات</th>
+                    <th>عملیات</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td data-label="شخص">@item.Person.FirstName @item.Person.LastName</td>
+                        <td data-label="شماره ملی"><span class="mono">@item.Person.NationalCode</span></td>
+                        <td data-label="واحد مراجعه‌کننده">@item.VisitingUnit.Title</td>
+                        <td data-label="ساعت ورود"><span class="mono">@PersianDate.ToPersianTime(item.EntryTime)</span></td>
+                        <td class="wrap" data-label="توضیحات">@(item.EntryDescription ?? "—")</td>
+                        <td class="actions" data-label="عملیات">
+                            <a class="button small" asp-action="Exit" asp-route-id="@item.VisitId">ثبت خروج</a>
+                        </td>
+                    </tr>
+                }
+                <tr data-empty-row hidden>
+                    <td colspan="6">
+                        <partial name="_EmptyState" model="@("در حال حاضر هیچ مراجعه‌کننده‌ای در مجموعه حضور ندارد.")" />
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <partial name="_TablePager" />
+</div>

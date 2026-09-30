@@ -3,27 +3,71 @@
     ViewData["Title"] = "ویرایش شخص";
     var units = (IEnumerable<VisitRegistry.Models.OrganizationalUnit>)ViewBag.Units;
 }
-<div class="page-head"><h1>ویرایش شخص</h1><a asp-action="Index">بازگشت</a></div>
-<div class="card form-grid">
-<form asp-action="Edit" method="post">
-    @Html.AntiForgeryToken()
-    <input type="hidden" asp-for="PersonId" />
-    <input type="hidden" asp-for="RecordVersion" />
-    <div asp-validation-summary="All" class="validation"></div>
-    <label asp-for="FirstName"></label><input asp-for="FirstName" /><span asp-validation-for="FirstName" class="validation"></span>
-    <label asp-for="LastName"></label><input asp-for="LastName" /><span asp-validation-for="LastName" class="validation"></span>
-    <label asp-for="NationalCode"></label><input asp-for="NationalCode" inputmode="numeric" /><span asp-validation-for="NationalCode" class="validation"></span>
-    <label asp-for="Mobile"></label><input asp-for="Mobile" inputmode="tel" /><span asp-validation-for="Mobile" class="validation"></span>
-    <label asp-for="OrganizationalUnitId"></label>
-    <select asp-for="OrganizationalUnitId">
-        <option value="0">انتخاب کنید</option>
-        @foreach (var u in units)
-        {
-            <option value="@u.OrganizationalUnitId">@u.Title</option>
-        }
-    </select>
-    <span asp-validation-for="OrganizationalUnitId" class="validation"></span>
-    <label class="check"><input asp-for="IsActive" /> فعال</label>
-    <button class="button" type="submit">ذخیره تغییرات</button>
-</form>
+<div class="page-head">
+    <div class="page-title">
+        <span class="page-title-icon" aria-hidden="true"><svg><use href="#i-edit"></use></svg></span>
+        <div>
+            <h1>ویرایش شخص</h1>
+            <p class="subtitle">اصلاح اطلاعات فردی مراجعه‌کننده</p>
+        </div>
+    </div>
+    <a asp-action="Index">بازگشت به فهرست</a>
+</div>
+
+<div class="card form-grid two">
+    <div class="card-head">
+        <h2>اطلاعات فردی</h2>
+    </div>
+
+    <form asp-action="Edit" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="PersonId" />
+        <input type="hidden" asp-for="RecordVersion" />
+        <div asp-validation-summary="All" class="validation validation-summary-errors"></div>
+
+        <div>
+            <label asp-for="FirstName">نام <span class="req">*</span></label>
+            <input asp-for="FirstName" autocomplete="given-name" />
+            <span asp-validation-for="FirstName" class="validation"></span>
+        </div>
+
+        <div>
+            <label asp-for="LastName">نام خانوادگی <span class="req">*</span></label>
+            <input asp-for="LastName" autocomplete="family-name" />
+            <span asp-validation-for="LastName" class="validation"></span>
+        </div>
+
+        <div>
+            <label asp-for="NationalCode">شماره ملی <span class="req">*</span></label>
+            <input asp-for="NationalCode" inputmode="numeric" maxlength="10" class="mono" autocomplete="off" />
+            <span asp-validation-for="NationalCode" class="validation"></span>
+        </div>
+
+        <div>
+            <label asp-for="Mobile">موبایل <span class="req">*</span></label>
+            <input asp-for="Mobile" inputmode="tel" maxlength="11" class="mono" autocomplete="off" />
+            <span asp-validation-for="Mobile" class="validation"></span>
+        </div>
+
+        <div class="span-2">
+            <label asp-for="OrganizationalUnitId">واحد سازمانی <span class="req">*</span></label>
+            <select asp-for="OrganizationalUnitId">
+                <option value="0">انتخاب کنید</option>
+                @foreach (var u in units)
+                {
+                    <option value="@u.OrganizationalUnitId">@u.Title</option>
+                }
+            </select>
+            <span asp-validation-for="OrganizationalUnitId" class="validation"></span>
+        </div>
+
+        <div class="span-2">
+            <label class="check"><input asp-for="IsActive" /> فعال باشد</label>
+        </div>
+
+        <div class="form-actions span-2">
+            <button class="button" type="submit"><svg aria-hidden="true"><use href="#i-check"></use></svg> ذخیره تغییرات</button>
+            <a class="button ghost" asp-action="Index">انصراف</a>
+        </div>
+    </form>
 </div>

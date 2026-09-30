@@ -18,7 +18,15 @@ public class VisitsController(ApplicationDbContext db, VisitService visits) : Co
             .AsNoTracking();
         if (!string.IsNullOrWhiteSpace(search))
             query = query.Where(x => x.Person.FirstName.Contains(search) || x.Person.LastName.Contains(search) || x.Person.NationalCode.Contains(search));
-        return View(await query.OrderByDescending(x => x.EntryDate).ThenByDescending(x => x.EntryTime).Take(500).ToListAsync());
+        var result = await query
+            .OrderByDescending(x => x.EntryDate)
+            .Take(500)
+            .ToListAsync();
+
+        return View(result
+            .OrderByDescending(x => x.EntryDate)
+            .ThenByDescending(x => x.EntryTime)
+            .ToList());
     }
 
     [Authorize(Roles = "مدیر سامانه,اپراتور")]
@@ -154,9 +162,9 @@ public class VisitsController(ApplicationDbContext db, VisitService visits) : Co
                 (x.EntryDescription != null && x.EntryDescription.Contains(search)));
         }
 
-        var visits = await query
+        var visits = (await query.ToListAsync())
             .OrderBy(x => x.EntryTime)
-            .ToListAsync();
+            .ToList();
 
         return View(visits);
     }

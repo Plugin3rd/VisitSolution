@@ -1,12 +1,101 @@
 @model IEnumerable<(VisitRegistry.Models.ApplicationUser User, string Role)>
+@using VisitRegistry.Services
+@inject PersianDateService PersianDate
 @{ ViewData["Title"] = "کاربران"; }
-<div class="page-head"><h1>کاربران و سطوح دسترسی</h1><a class="button" asp-action="Create">کاربر جدید</a></div>
-<form method="get" class="searchbar">
-    <input name="search" value="@Context.Request.Query["search"]" placeholder="نام کاربری، نام نمایشی، نقش یا وضعیت" />
-    <button class="button secondary" type="submit">جستجو</button>
-    @if (!string.IsNullOrWhiteSpace(Context.Request.Query["search"]))
-    {
-        <a class="button secondary" asp-action="Index">پاک کردن</a>
-    }
-</form>
-<div class="card table-wrap"><table class="responsive-table"><thead><tr><th>نام کاربری</th><th>نام نمایشی</th><th>نقش</th><th>وضعیت</th><th>آخرین ورود</th><th>عملیات</th></tr></thead><tbody>@foreach(var x in Model){<tr><td data-label="نام کاربری">@x.User.UserName</td><td data-label="نام نمایشی">@x.User.DisplayName</td><td data-label="نقش">@x.Role</td><td data-label="وضعیت">@(x.User.IsActive ? "فعال" : "غیرفعال")</td><td data-label="آخرین ورود">@(x.User.LastLoginAt.HasValue ? x.User.LastLoginAt.Value.ToLocalTime().ToString("yyyy/MM/dd HH:mm") : "هنوز وارد نشده")</td><td class="actions" data-label="عملیات"><a class="button small secondary" asp-action="Edit" asp-route-id="@x.User.Id">ویرایش</a>@if(x.User.Id != User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value){<form asp-action="Delete" asp-route-id="@x.User.Id" method="post" class="inline" onsubmit="return confirm('آیا از حذف این کاربر مطمئن هستید؟');">@Html.AntiForgeryToken()<button type="submit" class="button small danger">حذف</button></form>}</td></tr>} </tbody></table></div>
+<div class="page-head">
+    <div class="page-title">
+        <span class="page-title-icon" aria-hidden="true"><svg><use href="#i-lock"></use></svg></span>
+        <div>
+            <h1>کاربران و سطوح دسترسی</h1>
+            <p class="subtitle">مدیریت حساب‌های کاربری و نقش‌ها</p>
+        </div>
+    </div>
+    <a class="button" asp-action="Create"><svg aria-hidden="true"><use href="#i-user-plus"></use></svg> کاربر جدید</a>
+</div>
+
+@await Html.PartialAsync("_SearchBar", "نام کاربری، نام نمایشی، نقش یا وضعیت")
+
+<div class="card flush">
+    <div class="table-toolbar">
+        <span class="count js-row-count"></span>
+        <div class="search-field table-search js-table-search">
+            <svg class="search-icon" aria-hidden="true"><use href="#i-search"></use></svg>
+            <input type="search" placeholder="فیلتر سریع در همین صفحه" aria-label="فیلتر سریع جدول" autocomplete="off" />
+            <button type="button" class="clear-search" aria-label="پاک کردن فیلتر">
+                <svg style="width:14px;height:14px" aria-hidden="true"><use href="#i-x"></use></svg>
+            </button>
+        </div>
+    </div>
+
+    <div class="table-wrap">
+        <table class="responsive-table users-table" data-table>
+            <thead>
+                <tr>
+                    <th class="sortable">نام کاربری</th>
+                    <th class="sortable">نام نمایشی</th>
+                    <th>نقش</th>
+                    <th>وضعیت</th>
+                    <th class="sortable">آخرین ورود</th>
+                    <th>عملیات</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var x in Model)
+                {
+                    var initials = string.Concat(x.User.DisplayName.Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(2).Select(p => p[..1]));
+                    <tr>
+                        <td data-label="نام کاربری"><span class="mono">@x.User.UserName</span></td>
+                        <td data-label="نام نمایشی">
+                            <span class="flex gap-1" style="align-items:center">
+                                <span class="avatar sm" aria-hidden="true">@initials</span>
+                                <span>@x.User.DisplayName</span>
+                            </span>
+                        </td>
+                        <td data-label="نقش"><span class="badge brand">@x.Role</span></td>
+                        <td data-label="وضعیت">
+                            @if (x.User.IsActive)
+                            {
+                                <span class="badge success">فعال</span>
+                            }
+                            else
+                            {
+                                <span class="badge danger">غیرفعال</span>
+                            }
+                        </td>
+                        <td data-label="آخرین ورود">
+                            @if (x.User.LastLoginAt.HasValue)
+                            {
+                                <span class="mono">@PersianDate.ToPersianDateTime(x.User.LastLoginAt.Value.ToLocalTime())</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">هنوز وارد نشده</span>
+                            }
+                        </td>
+                        <td class="actions" data-label="عملیات">
+                            <a class="button small secondary" asp-action="Edit" asp-route-id="@x.User.Id">
+                                <svg aria-hidden="true"><use href="#i-edit"></use></svg> ویرایش
+                            </a>
+                            @if (x.User.Id != User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value)
+                            {
+                                <form asp-action="Delete" asp-route-id="@x.User.Id" method="post" class="inline" data-confirm="آیا از حذف این کاربر مطمئن هستید؟ این عمل بازگشت‌پذیر نیست.">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="button small soft-danger">
+                                        <svg aria-hidden="true"><use href="#i-trash"></use></svg> حذف
+                                    </button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+                <tr data-empty-row hidden>
+                    <td colspan="6">
+                        <partial name="_EmptyState" model="@("کاربری یافت نشد. عبارت جستجو را تغییر دهید یا کاربر جدیدی بسازید.")" />
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <partial name="_TablePager" />
+</div>

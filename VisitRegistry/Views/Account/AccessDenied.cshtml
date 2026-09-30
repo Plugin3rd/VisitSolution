@@ -1,6 +1,17 @@
 @{ ViewData["Title"] = "دسترسی غیرمجاز"; }
 <div class="card">
-    <h1>دسترسی غیرمجاز</h1>
-    <p>شما مجوز دسترسی به این بخش را ندارید.</p>
-    <a class="button" asp-controller="Home" asp-action="Index">بازگشت به داشبورد</a>
+    <div class="state-page">
+        <div class="state-icon danger" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" />
+            </svg>
+        </div>
+        <h1>دسترسی غیرمجاز</h1>
+        <p>شما مجوز دسترسی به این بخش از سامانه را ندارید. در صورت نیاز با مدیر سامانه تماس بگیرید.</p>
+        <div class="actions" style="justify-content:center">
+            <a class="button" asp-controller="Home" asp-action="Index">
+                <svg aria-hidden="true"><use href="#i-dashboard"></use></svg> بازگشت به داشبورد
+            </a>
+        </div>
+    </div>
 </div>

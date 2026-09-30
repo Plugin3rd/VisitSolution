@@ -1,18 +1,83 @@
+@using VisitRegistry.Services
+@inject PersianDateService PersianDate
 @{
     ViewData["Title"] = "داشبورد";
+    var personCount = Convert.ToInt64(ViewBag.PersonCount);
+    var todayVisits = Convert.ToInt64(ViewBag.TodayVisits);
+    var openVisits = Convert.ToInt64(ViewBag.OpenVisits);
+    var blackListCount = Convert.ToInt64(ViewBag.BlackListCount);
 }
-<h1>داشبورد</h1>
-<div class="stats">
-    <div class="stat"><div>افراد فعال</div><strong>@ViewBag.PersonCount</strong></div>
-    <div class="stat"><div>مراجعات امروز</div><strong>@ViewBag.TodayVisits</strong></div>
-    <div class="stat"><div>افراد حاضر</div><strong>@ViewBag.OpenVisits</strong></div>
-    <div class="stat"><div>بلک‌لیست فعال</div><strong>@ViewBag.BlackListCount</strong></div>
-</div>
-<div class="card">
-    <h2>عملیات سریع</h2>
+<div class="page-head">
+    <div class="page-title">
+        <span class="page-title-icon" aria-hidden="true"><svg><use href="#i-dashboard"></use></svg></span>
+        <div>
+            <h1>داشبورد</h1>
+            <p class="subtitle">@PersianDate.ToPersianLong(DateTime.Now)</p>
+        </div>
+    </div>
     <div class="actions">
-        <a class="button" asp-controller="Visits" asp-action="Create">ثبت مراجعه جدید</a>
-        <a class="button secondary" asp-controller="Persons" asp-action="Create">ثبت شخص جدید</a>
-        <a class="button secondary" asp-controller="Visits" asp-action="Open">مشاهده افراد حاضر</a>
+        <a class="button" asp-controller="Visits" asp-action="Create"><svg aria-hidden="true"><use href="#i-plus"></use></svg> ثبت مراجعه جدید</a>
+    </div>
+</div>
+
+<div class="stats">
+    <div class="stat">
+        <div class="stat-head">
+            <span class="stat-icon blue" aria-hidden="true"><svg><use href="#i-users"></use></svg></span>
+            <div class="stat-label">افراد فعال</div>
+        </div>
+        <strong>@PersianDate.ToPersianNumber(personCount)</strong>
+        <div class="stat-foot">افراد ثبت‌شده و فعال سامانه</div>
+    </div>
+    <div class="stat">
+        <div class="stat-head">
+            <span class="stat-icon cyan" aria-hidden="true"><svg><use href="#i-calendar"></use></svg></span>
+            <div class="stat-label">مراجعات امروز</div>
+        </div>
+        <strong>@PersianDate.ToPersianNumber(todayVisits)</strong>
+        <div class="stat-foot">ثبت‌شده در روز جاری</div>
+    </div>
+    <div class="stat">
+        <div class="stat-head">
+            <span class="stat-icon green" aria-hidden="true"><svg><use href="#i-users-group"></use></svg></span>
+            <div class="stat-label">افراد حاضر</div>
+        </div>
+        <strong>@PersianDate.ToPersianNumber(openVisits)</strong>
+        <div class="stat-foot">دارای مراجعه باز</div>
+    </div>
+    <div class="stat">
+        <div class="stat-head">
+            <span class="stat-icon red" aria-hidden="true"><svg><use href="#i-shield-off"></use></svg></span>
+            <div class="stat-label">بلک‌لیست فعال</div>
+        </div>
+        <strong>@PersianDate.ToPersianNumber(blackListCount)</strong>
+        <div class="stat-foot">ممنوعیت ورود معتبر</div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-head">
+        <h2>عملیات سریع</h2>
+    </div>
+    <div class="actions dashboard-actions">
+        <a class="button" asp-controller="Visits" asp-action="Create"><svg aria-hidden="true"><use href="#i-login"></use></svg> ثبت مراجعه جدید</a>
+        <a class="button secondary" asp-controller="Visits" asp-action="Open"><svg aria-hidden="true"><use href="#i-users-group"></use></svg> افراد حاضر</a>
+        <a class="button secondary" asp-controller="Visits" asp-action="Index"><svg aria-hidden="true"><use href="#i-history"></use></svg> سوابق مراجعات</a>
+        @if (User.IsInRole("مدیر سامانه") || User.IsInRole("اپراتور"))
+        {
+            <a class="button secondary" asp-controller="Persons" asp-action="Create"><svg aria-hidden="true"><use href="#i-user-plus"></use></svg> ثبت شخص جدید</a>
+        }
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-head">
+        <h2>میان‌برها</h2>
+    </div>
+    <div class="actions dashboard-shortcuts">
+        <a class="chip" asp-controller="Visits" asp-action="Open"><svg style="width:14px;height:14px" aria-hidden="true"><use href="#i-users-group"></use></svg> لیست افراد حاضر</a>
+        <a class="chip" asp-controller="BlackList" asp-action="Index"><svg style="width:14px;height:14px" aria-hidden="true"><use href="#i-shield-off"></use></svg> فهرست ممنوع‌الورود</a>
+        <a class="chip" asp-controller="OrganizationalUnits" asp-action="Index"><svg style="width:14px;height:14px" aria-hidden="true"><use href="#i-sitemap"></use></svg> واحدهای سازمانی</a>
+        <a class="chip" asp-controller="Persons" asp-action="Index"><svg style="width:14px;height:14px" aria-hidden="true"><use href="#i-users"></use></svg> فهرست اشخاص</a>
     </div>
 </div>

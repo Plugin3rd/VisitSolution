@@ -1,13 +1,108 @@
 @model IEnumerable<VisitRegistry.Models.BlackListEntry>
-@inject VisitRegistry.Services.PersianDateService PersianDate
+@using VisitRegistry.Services
+@inject PersianDateService PersianDate
 @{ ViewData["Title"] = "بلک‌لیست"; }
-<div class="page-head"><h1>فهرست ممنوع‌الورود</h1>@if(User.IsInRole("مدیر سامانه")){<a class="button" asp-action="Create">ثبت ممنوعیت</a>}</div>
-<form method="get" class="searchbar">
-    <input name="search" value="@Context.Request.Query["search"]" placeholder="نام، نام خانوادگی، شماره ملی، موبایل یا علت ممنوعیت" />
-    <button class="button secondary" type="submit">جستجو</button>
-    @if (!string.IsNullOrWhiteSpace(Context.Request.Query["search"]))
+<div class="page-head">
+    <div class="page-title">
+        <span class="page-title-icon" aria-hidden="true"><svg><use href="#i-shield-off"></use></svg></span>
+        <div>
+            <h1>فهرست ممنوع‌الورود</h1>
+            <p class="subtitle">افرادی که ورود آن‌ها به مجموعه ممنوع است</p>
+        </div>
+    </div>
+    @if (User.IsInRole("مدیر سامانه"))
     {
-        <a class="button secondary" asp-action="Index">پاک کردن</a>
+        <a class="button" asp-action="Create"><svg aria-hidden="true"><use href="#i-plus"></use></svg> ثبت ممنوعیت</a>
     }
-</form>
-<div class="card table-wrap"><table class="responsive-table"><thead><tr><th>شخص</th><th>شماره ملی</th><th>علت</th><th>شروع</th><th>پایان</th><th>وضعیت</th>@if(User.IsInRole("مدیر سامانه")){<th>عملیات</th>}</tr></thead><tbody>@foreach(var x in Model){<tr><td data-label="شخص">@x.Person?.FirstName @x.Person?.LastName</td><td data-label="شماره ملی">@x.Person?.NationalCode</td><td data-label="علت">@x.Reason</td><td data-label="شروع">@PersianDate.ToPersian(x.StartDate)</td><td data-label="پایان">@(x.EndDate.HasValue ? PersianDate.ToPersian(x.EndDate.Value) : "بدون پایان")</td><td data-label="وضعیت">@(x.IsActive ? "فعال" : "غیرفعال")</td>@if(User.IsInRole("مدیر سامانه")){<td class="actions" data-label="عملیات"><a class="button small secondary" asp-action="Edit" asp-route-id="@x.BlackListEntryId">ویرایش</a><form asp-action="Delete" asp-route-id="@x.BlackListEntryId" method="post" class="inline" onsubmit="return confirm('آیا از حذف این رکورد ممنوعیت مطمئن هستید؟');">@Html.AntiForgeryToken()<button type="submit" class="button small danger">حذف</button></form></td>}</tr>}</tbody></table></div>
+</div>
+
+@await Html.PartialAsync("_SearchBar", "نام، نام خانوادگی، شماره ملی، موبایل یا علت ممنوعیت")
+
+<div class="card flush">
+    <div class="table-toolbar">
+        <span class="count js-row-count"></span>
+        <div class="search-field table-search js-table-search">
+            <svg class="search-icon" aria-hidden="true"><use href="#i-search"></use></svg>
+            <input type="search" placeholder="فیلتر سریع در همین صفحه" aria-label="فیلتر سریع جدول" autocomplete="off" />
+            <button type="button" class="clear-search" aria-label="پاک کردن فیلتر">
+                <svg style="width:14px;height:14px" aria-hidden="true"><use href="#i-x"></use></svg>
+            </button>
+        </div>
+    </div>
+
+    <div class="table-wrap">
+        <table class="responsive-table" data-table>
+            <thead>
+                <tr>
+                    <th class="sortable">شخص</th>
+                    <th>شماره ملی</th>
+                    <th class="wrap">علت ممنوعیت</th>
+                    <th class="sortable">شروع</th>
+                    <th>پایان</th>
+                    <th>وضعیت</th>
+                    @if (User.IsInRole("مدیر سامانه"))
+                    {
+                        <th>عملیات</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var x in Model)
+                {
+                    var active = x.IsActive && x.StartDate.Date <= DateTime.Today && (!x.EndDate.HasValue || x.EndDate.Value.Date >= DateTime.Today);
+                    <tr>
+                        <td data-label="شخص">@x.Person?.FirstName @x.Person?.LastName</td>
+                        <td data-label="شماره ملی"><span class="mono">@x.Person?.NationalCode</span></td>
+                        <td class="wrap" data-label="علت ممنوعیت">@x.Reason</td>
+                        <td data-label="شروع"><span class="mono">@PersianDate.ToPersianDigitsDate(x.StartDate)</span></td>
+                        <td data-label="پایان">
+                            @if (x.EndDate.HasValue)
+                            {
+                                <span class="mono">@PersianDate.ToPersianDigitsDate(x.EndDate.Value)</span>
+                            }
+                            else
+                            {
+                                <span class="badge info no-dot">دائمی</span>
+                            }
+                        </td>
+                        <td data-label="وضعیت">
+                            @if (active)
+                            {
+                                <span class="badge danger">مؤثر</span>
+                            }
+                            else if (x.IsActive)
+                            {
+                                <span class="badge warning">در انتظار</span>
+                            }
+                            else
+                            {
+                                <span class="badge neutral">غیرفعال</span>
+                            }
+                        </td>
+                        @if (User.IsInRole("مدیر سامانه"))
+                        {
+                            <td class="actions" data-label="عملیات">
+                                <a class="button small secondary" asp-action="Edit" asp-route-id="@x.BlackListEntryId">
+                                    <svg aria-hidden="true"><use href="#i-edit"></use></svg> ویرایش
+                                </a>
+                                <form asp-action="Delete" asp-route-id="@x.BlackListEntryId" method="post" class="inline" data-confirm="آیا از حذف این رکورد ممنوعیت مطمئن هستید؟ این عمل بازگشت‌پذیر نیست.">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="button small soft-danger">
+                                        <svg aria-hidden="true"><use href="#i-trash"></use></svg> حذف
+                                    </button>
+                                </form>
+                            </td>
+                        }
+                    </tr>
+                }
+                <tr data-empty-row hidden>
+                    <td colspan="7">
+                        <partial name="_EmptyState" model="@("رکورد ممنوعیتی یافت نشد. عبارت جستجو را تغییر دهید یا رکورد جدیدی ثبت کنید.")" />
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <partial name="_TablePager" />
+</div>

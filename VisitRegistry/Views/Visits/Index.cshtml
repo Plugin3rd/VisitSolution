@@ -1,13 +1,97 @@
 @model IEnumerable<VisitRegistry.Models.Visit>
-@inject VisitRegistry.Services.PersianDateService PersianDate
+@using VisitRegistry.Services
+@inject PersianDateService PersianDate
 @{
     ViewData["Title"] = "سوابق مراجعات";
 }
-<div class="page-head"><h1>سوابق مراجعات</h1><a class="button" asp-action="Create">ثبت مراجعه</a></div>
-<form method="get" class="searchbar"><input name="search" value="@Context.Request.Query["search"]" placeholder="نام، نام خانوادگی یا شماره ملی" /><button class="button secondary">جستجو</button></form>
-<div class="card table-wrap"><table class="responsive-table"><thead><tr><th>شخص</th><th>شماره ملی</th><th>تاریخ ورود</th><th>ورود</th><th>واحد مراجعه‌کننده</th><th>خروج</th><th>وضعیت</th><th>عملیات</th></tr></thead><tbody>
-@foreach (var item in Model)
-{
-<tr><td data-label="شخص">@item.Person.FirstName @item.Person.LastName</td><td data-label="شماره ملی">@item.Person.NationalCode</td><td data-label="تاریخ ورود">@PersianDate.ToPersian(item.EntryDate)</td><td data-label="ورود">@item.EntryTime.ToString(@"hh\:mm")</td><td data-label="واحد مراجعه‌کننده">@item.VisitingUnit.Title</td><td data-label="خروج">@(item.ExitTime.HasValue ? item.ExitTime.Value.ToString(@"hh\:mm") : "-")</td><td data-label="وضعیت">@(item.IsOpen ? "حاضر" : "خارج شده")</td><td data-label="عملیات">@if(item.IsOpen && (User.IsInRole("مدیر سامانه") || User.IsInRole("اپراتور"))){<a asp-action="Exit" asp-route-id="@item.VisitId">ثبت خروج</a>}</td></tr>
-}
-</tbody></table></div>
+<div class="page-head">
+    <div class="page-title">
+        <span class="page-title-icon" aria-hidden="true"><svg><use href="#i-history"></use></svg></span>
+        <div>
+            <h1>سوابق مراجعات</h1>
+            <p class="subtitle">تاریخچه ورود و خروج ثبت‌شده در سامانه</p>
+        </div>
+    </div>
+    <a class="button" asp-action="Create"><svg aria-hidden="true"><use href="#i-plus"></use></svg> ثبت مراجعه</a>
+</div>
+
+@await Html.PartialAsync("_SearchBar", "نام، نام خانوادگی یا شماره ملی")
+
+<div class="card flush">
+    <div class="table-toolbar">
+        <span class="count js-row-count"></span>
+        <div class="search-field table-search js-table-search">
+            <svg class="search-icon" aria-hidden="true"><use href="#i-search"></use></svg>
+            <input type="search" placeholder="فیلتر سریع در همین صفحه" aria-label="فیلتر سریع جدول" autocomplete="off" />
+            <button type="button" class="clear-search" aria-label="پاک کردن فیلتر">
+                <svg style="width:14px;height:14px" aria-hidden="true"><use href="#i-x"></use></svg>
+            </button>
+        </div>
+    </div>
+
+    <div class="table-wrap">
+        <table class="responsive-table" data-table>
+            <thead>
+                <tr>
+                    <th class="sortable">شخص</th>
+                    <th>شماره ملی</th>
+                    <th class="sortable">تاریخ ورود</th>
+                    <th>ساعت ورود</th>
+                    <th>واحد مراجعه‌کننده</th>
+                    <th>ساعت خروج</th>
+                    <th>وضعیت</th>
+                    <th>عملیات</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td data-label="شخص">@item.Person.FirstName @item.Person.LastName</td>
+                        <td data-label="شماره ملی"><span class="mono">@item.Person.NationalCode</span></td>
+                        <td data-label="تاریخ ورود"><span class="mono">@PersianDate.ToPersianDigitsDate(item.EntryDate)</span></td>
+                        <td data-label="ساعت ورود"><span class="mono">@PersianDate.ToPersianTime(item.EntryTime)</span></td>
+                        <td data-label="واحد مراجعه‌کننده">@item.VisitingUnit.Title</td>
+                        <td data-label="ساعت خروج">
+                            @if (item.ExitTime.HasValue)
+                            {
+                                <span class="mono">@PersianDate.ToPersianTime(item.ExitTime.Value)</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">—</span>
+                            }
+                        </td>
+                        <td data-label="وضعیت">
+                            @if (item.IsOpen)
+                            {
+                                <span class="badge success">حاضر</span>
+                            }
+                            else
+                            {
+                                <span class="badge neutral">خارج شده</span>
+                            }
+                        </td>
+                        <td class="actions" data-label="عملیات">
+                            @if (item.IsOpen && (User.IsInRole("مدیر سامانه") || User.IsInRole("اپراتور")))
+                            {
+                                <a class="button small secondary" asp-action="Exit" asp-route-id="@item.VisitId">ثبت خروج</a>
+                            }
+                            else
+                            {
+                                <span class="text-muted">—</span>
+                            }
+                        </td>
+                    </tr>
+                }
+                <tr data-empty-row hidden>
+                    <td colspan="8">
+                        <partial name="_EmptyState" model="@("مراجعه‌ای یافت نشد. عبارت جستجو را تغییر دهید یا مراجعه جدیدی ثبت کنید.")" />
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <partial name="_TablePager" />
+</div>

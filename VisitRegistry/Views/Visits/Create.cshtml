@@ -1,178 +1,88 @@
 @model VisitRegistry.ViewModels.VisitEntryViewModel
+@using VisitRegistry.Services
+@inject PersianDateService PersianDate
 @{
     ViewData["Title"] = "ثبت مراجعه";
     var units = (IEnumerable<VisitRegistry.Models.OrganizationalUnit>)ViewBag.Units;
 }
-<div class="page-head"><h1>ثبت ورود مراجعه‌کننده</h1><a asp-action="Index">سوابق</a></div>
-<div class="card">
-<form asp-action="Create" method="post" id="visit-entry-form">
-    @Html.AntiForgeryToken()
-    <div asp-validation-summary="All" class="validation"></div>
-
-    <label for="person-search">شخص</label>
-    <div class="person-picker" id="person-picker">
-        <input type="text"
-               id="person-search"
-               class="person-search-input"
-               autocomplete="off"
-               placeholder="نام، نام خانوادگی، شماره ملی یا موبایل را وارد کنید..."
-               aria-label="جستجوی شخص" />
-        <input asp-for="PersonId" type="hidden" id="person-id" />
-        <div id="person-selected" class="person-selected" hidden></div>
-        <div id="person-search-results" class="person-search-results" role="listbox" hidden></div>
+<div class="page-head">
+    <div class="page-title">
+        <span class="page-title-icon" aria-hidden="true"><svg><use href="#i-login"></use></svg></span>
+        <div>
+            <h1>ثبت ورود مراجعه‌کننده</h1>
+            <p class="subtitle">شناسایی شخص و ثبت ساعت ورود به مجموعه</p>
+        </div>
     </div>
-    <span id="person-help" class="field-help">حداقل ۲ حرف یا رقم وارد کنید.</span>
+    <a asp-action="Index">بازگشت به سوابق</a>
+</div>
 
-    <label asp-for="VisitingUnitId">واحد مراجعه‌کننده</label>
-    <select asp-for="VisitingUnitId">
-        <option value="">انتخاب واحد</option>
-        @foreach (var u in units)
-        {
-            <option value="@u.OrganizationalUnitId">@u.Title</option>
-        }
-    </select>
+<div class="card form-grid two visit-entry-card">
+    <div class="card-head">
+        <h2>اطلاعات مراجعه</h2>
+        <span class="chip">@PersianDate.ToPersianLong(DateTime.Now)</span>
+    </div>
 
-    <label asp-for="EntryTime">ساعت ورود</label>
-    <input asp-for="EntryTime" type="time" />
+    <form asp-action="Create" method="post" id="visit-entry-form" class="visit-entry-form">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="All" class="validation validation-summary-errors span-2"></div>
 
-    <label asp-for="EntryDescription">توضیحات ورود</label>
-    <textarea asp-for="EntryDescription"></textarea>
+        <div class="visit-field">
+            <label for="person-search">شخص <span class="req">*</span></label>
+            <div class="person-picker" id="person-picker"
+                 data-person-picker
+                 data-endpoint="@Url.Action("SearchPersons", "Visits")"
+                 data-form-id="visit-entry-form"
+                 data-help-id="person-help">
+                <input type="text"
+                       id="person-search"
+                       class="person-search-input"
+                       autocomplete="off"
+                       placeholder="نام، نام خانوادگی، شماره ملی یا موبایل را وارد کنید..."
+                       aria-label="جستجوی شخص" />
+                <input asp-for="PersonId" type="hidden" />
+                <div id="person-selected" class="person-selected" hidden></div>
+                <div id="person-search-results" class="person-search-results" role="listbox" hidden></div>
+            </div>
+            <span id="person-help" class="field-help">حداقل ۲ حرف یا رقم وارد کنید. با کلیدهای جهت‌دار می‌توانید در نتایج جابجا شوید.</span>
+            <span asp-validation-for="PersonId" class="validation"></span>
+        </div>
 
-    <button class="button" type="submit">ثبت ورود</button>
-</form>
+        <div class="visit-field">
+            <label asp-for="VisitingUnitId">واحد مراجعه‌کننده <span class="req">*</span></label>
+            <select asp-for="VisitingUnitId">
+                <option value="">انتخاب واحد</option>
+                @foreach (var u in units)
+                {
+                    <option value="@u.OrganizationalUnitId">@u.Title</option>
+                }
+            </select>
+            <span asp-validation-for="VisitingUnitId" class="validation"></span>
+        </div>
+
+        <div class="visit-field visit-time-field">
+            <label asp-for="EntryTime">ساعت ورود <span class="req">*</span></label>
+            <div class="field-with-btn">
+                <input asp-for="EntryTime" type="text" class="time-input" data-time-picker autocomplete="off" aria-describedby="entry-time-help" />
+                <button type="button" class="field-btn" aria-label="انتخاب ساعت ورود">
+                    <svg aria-hidden="true"><use href="#i-clock"></use></svg>
+                </button>
+            </div>
+            <span id="entry-time-help" class="field-help">ساعت را از انتخابگر یا به‌صورت ۲۴ ساعته مانند ۰۸:۳۰ وارد کنید.</span>
+            <span asp-validation-for="EntryTime" class="validation"></span>
+        </div>
+
+        <div class="visit-field">
+            <label asp-for="EntryDescription">توضیحات ورود</label>
+            <textarea asp-for="EntryDescription" placeholder="در صورت نیاز، توضیحی از مراجعه ثبت کنید..."></textarea>
+        </div>
+
+        <div class="form-actions span-2">
+            <button class="button" type="submit"><svg aria-hidden="true"><use href="#i-check"></use></svg> ثبت ورود</button>
+            <a class="button ghost" asp-action="Open">انصراف</a>
+        </div>
+    </form>
 </div>
 
 @section Scripts {
-<script>
-(() => {
-    const searchInput = document.getElementById('person-search');
-    const hiddenId = document.getElementById('person-id');
-    const results = document.getElementById('person-search-results');
-    const selected = document.getElementById('person-selected');
-    const help = document.getElementById('person-help');
-
-    let timer = null;
-    let request = null;
-
-    function escapeHtml(value) {
-        return String(value ?? '')
-            .replaceAll('&', '&amp;')
-            .replaceAll('<', '&lt;')
-            .replaceAll('>', '&gt;')
-            .replaceAll('"', '&quot;')
-            .replaceAll("'", '&#039;');
-    }
-
-    function hideResults() {
-        results.hidden = true;
-        results.innerHTML = '';
-    }
-
-    function clearSelected() {
-        hiddenId.value = '';
-        selected.hidden = true;
-        selected.innerHTML = '';
-    }
-
-    function selectPerson(person) {
-        hiddenId.value = person.id;
-        searchInput.value = `${person.name} - ${person.nationalCode}`;
-        selected.innerHTML = `
-            <div class="person-selected-name">${escapeHtml(person.name)}</div>
-            <div class="person-selected-meta">کد ملی: ${escapeHtml(person.nationalCode)}${person.mobile ? ` | موبایل: ${escapeHtml(person.mobile)}` : ''}${person.unit ? ` | واحد: ${escapeHtml(person.unit)}` : ''}</div>
-            <button type="button" class="person-clear" id="person-clear" aria-label="حذف انتخاب">تغییر شخص</button>`;
-        selected.hidden = false;
-        help.textContent = 'شخص انتخاب شد. برای تغییر، روی «تغییر شخص» بزنید.';
-        hideResults();
-
-        document.getElementById('person-clear').addEventListener('click', () => {
-            clearSelected();
-            searchInput.value = '';
-            searchInput.focus();
-            help.textContent = 'حداقل ۲ حرف یا رقم وارد کنید.';
-        });
-    }
-
-    function renderResults(items) {
-        if (!items.length) {
-            results.innerHTML = '<div class="person-no-result">شخصی با این مشخصات پیدا نشد.</div>';
-            results.hidden = false;
-            return;
-        }
-
-        results.innerHTML = items.map(person => `
-            <button type="button" class="person-result" role="option" data-id="${person.id}">
-                <span class="person-result-name">${escapeHtml(person.name)}</span>
-                <span class="person-result-meta">کد ملی: ${escapeHtml(person.nationalCode)}${person.mobile ? ` | ${escapeHtml(person.mobile)}` : ''}</span>
-                ${person.unit ? `<span class="person-result-unit">واحد: ${escapeHtml(person.unit)}</span>` : ''}
-            </button>`).join('');
-
-        results.querySelectorAll('.person-result').forEach(button => {
-            button.addEventListener('click', () => {
-                const person = items.find(x => String(x.id) === button.dataset.id);
-                if (person) selectPerson(person);
-            });
-        });
-        results.hidden = false;
-    }
-
-    async function searchPersons(term) {
-        if (request) request.abort();
-        request = new AbortController();
-        results.innerHTML = '<div class="person-no-result">در حال جستجو...</div>';
-        results.hidden = false;
-
-        try {
-            const response = await fetch(`@Url.Action("SearchPersons", "Visits")?term=${encodeURIComponent(term)}`, {
-                headers: { 'X-Requested-With': 'XMLHttpRequest' },
-                signal: request.signal
-            });
-            if (!response.ok) throw new Error('search-failed');
-            const items = await response.json();
-            renderResults(items);
-        } catch (error) {
-            if (error.name === 'AbortError') return;
-            results.innerHTML = '<div class="person-no-result person-error">خطا در جستجوی اشخاص. دوباره تلاش کنید.</div>';
-            results.hidden = false;
-        }
-    }
-
-    searchInput.addEventListener('input', () => {
-        clearSelected();
-        const term = searchInput.value.trim();
-        clearTimeout(timer);
-
-        if (term.length < 2) {
-            hideResults();
-            help.textContent = 'حداقل ۲ حرف یا رقم وارد کنید.';
-            return;
-        }
-
-        help.textContent = 'در حال جستجو...';
-        timer = setTimeout(() => searchPersons(term), 300);
-    });
-
-    searchInput.addEventListener('focus', () => {
-        if (searchInput.value.trim().length >= 2 && !hiddenId.value) {
-            searchPersons(searchInput.value.trim());
-        }
-    });
-
-    document.addEventListener('click', (event) => {
-        if (!document.getElementById('person-picker').contains(event.target)) {
-            hideResults();
-        }
-    });
-
-    document.getElementById('visit-entry-form').addEventListener('submit', (event) => {
-        if (!hiddenId.value) {
-            event.preventDefault();
-            clearSelected();
-            searchInput.focus();
-            help.textContent = 'ابتدا یک شخص را از نتایج جستجو انتخاب کنید.';
-            help.classList.add('field-error');
-        }
-    });
-})();
-</script>
+    <script src="~/js/person-picker.js" asp-append-version="true"></script>
 }

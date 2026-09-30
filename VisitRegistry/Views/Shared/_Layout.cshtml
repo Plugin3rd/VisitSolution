@@ -1,53 +1,193 @@
 @using VisitRegistry.Services
+@using System.Security.Claims
 @inject PersianDateService PersianDate
+@inject ICurrentUserService CurrentUser
+@{
+    var pageTitle = ViewData["Title"] as string ?? "داشبورد";
+    var controllerName = (ViewContext.RouteData.Values["controller"] as string) ?? "Home";
+
+    var controllerLabels = new Dictionary<string, string>
+    {
+        ["Home"] = "داشبورد",
+        ["Persons"] = "اشخاص",
+        ["Visits"] = "مراجعات",
+        ["BlackList"] = "بلک‌لیست",
+        ["OrganizationalUnits"] = "واحدهای سازمانی",
+        ["Users"] = "کاربران و دسترسی‌ها"
+    };
+    var sectionLabel = controllerLabels.TryGetValue(controllerName, out var label) ? label : "داشبورد";
+
+    var role = User.FindAll(ClaimTypes.Role).Select(x => x.Value).FirstOrDefault() ?? "کاربر سامانه";
+    var displayName = CurrentUser.UserDisplayName;
+    var initials = string.IsNullOrWhiteSpace(displayName)
+        ? "؟"
+        : string.Concat(displayName.Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(2).Select(p => p[..1]));
+}
 <!doctype html>
-<html lang="fa" dir="rtl">
+<html lang="fa" dir="rtl" data-theme="light">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>@ViewData["Title"] - سامانه ثبت مراجعات</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#0f2557" />
+    <meta name="description" content="سامانه ثبت و کنترل تردد مراجعه‌کنندگان" />
+    <title>@pageTitle | سامانه ثبت مراجعات</title>
+
+    <link rel="preload" href="~/fonts/Vazirmatn-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="~/fonts/Vazirmatn-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+
+    <link rel="stylesheet" href="~/lib/persian-datepicker/dist/css/persian-datepicker.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/persian-datepicker/dist/css/theme/persian-datepicker-blue.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/bootstrap-timepicker/css/bootstrap-timepicker.min.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/pickers.css" asp-append-version="true" />
 </head>
 <body>
-<header class="topbar">
-    <div class="topbar-right">
-        <button type="button" class="menu-toggle" id="menu-toggle" aria-label="نمایش منو" aria-expanded="false" aria-controls="main-sidebar">☰</button>
-        <div class="brand">سامانه ثبت مراجعات</div>
+    <partial name="_Icons" />
+
+    <a href="#main-content" class="sr-only">پرش به محتوای اصلی</a>
+
+    <header class="topbar">
+        <div class="topbar-right">
+            <button type="button" class="menu-toggle" id="menu-toggle" aria-label="نمایش منو" aria-expanded="false" aria-controls="main-sidebar">
+                <svg aria-hidden="true"><use href="#i-menu"></use></svg>
+            </button>
+            <div class="brand">
+                <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" /></svg></span>
+                <span class="brand-text">
+                    سامانه ثبت مراجعات
+                    <span class="brand-sub">کنترل تردد مراجعه‌کنندگان</span>
+                </span>
+            </div>
+        </div>
+
+        <div class="topbar-left">
+            <button type="button" class="iconbtn" data-theme-toggle aria-pressed="false" aria-label="تغییر پوسته روشن و تاریک">
+                <svg aria-hidden="true" class="theme-light"><use href="#i-sun"></use></svg>
+                <svg aria-hidden="true" class="theme-dark"><use href="#i-moon"></use></svg>
+            </button>
+
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <div class="userbox">
+                    <button type="button" class="user-trigger" id="user-trigger" data-dropdown="user-menu" aria-haspopup="true" aria-expanded="false">
+                        <span class="avatar" aria-hidden="true">@initials</span>
+                        <span class="user-meta">
+                            <span class="user-name">@displayName</span>
+                            <span class="user-role">@role</span>
+                        </span>
+                        <svg class="chev" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
+                    </button>
+                    <div class="dropdown" id="user-menu">
+                        <div class="dropdown-header">
+                            <strong>@displayName</strong>
+                            <span>@role</span>
+                        </div>
+                        <a class="dropdown-item" asp-controller="Home" asp-action="Index">
+                            <svg aria-hidden="true"><use href="#i-dashboard"></use></svg> داشبورد
+                        </a>
+                        @if (User.IsInRole("مدیر سامانه"))
+                        {
+                            <a class="dropdown-item" asp-controller="Users" asp-action="Index">
+                                <svg aria-hidden="true"><use href="#i-users"></use></svg> کاربران و دسترسی‌ها
+                            </a>
+                        }
+                        <button type="button" class="dropdown-item" data-theme-toggle>
+                            <svg aria-hidden="true"><use href="#i-sun"></use></svg> تغییر پوسته
+                        </button>
+                        <hr class="divider" style="margin:6px 0" />
+                        <form asp-controller="Account" asp-action="Logout" method="post" data-no-loading="1">
+                            @Html.AntiForgeryToken()
+                            <button class="dropdown-item danger" type="submit">
+                                <svg aria-hidden="true"><use href="#i-logout"></use></svg> خروج از سامانه
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            }
+        </div>
+    </header>
+
+    <div class="app-shell">
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+        <aside class="sidebar" id="main-sidebar">
+            <button type="button" class="sidebar-close" id="sidebar-close" aria-label="بستن منو">
+                <svg aria-hidden="true"><use href="#i-close"></use></svg>
+            </button>
+
+            <div class="nav-heading">منوی اصلی</div>
+            <a asp-controller="Home" asp-action="Index"><svg aria-hidden="true"><use href="#i-dashboard"></use></svg> داشبورد</a>
+
+            <div class="nav-heading">عملیات</div>
+            <a asp-controller="Visits" asp-action="Create"><svg aria-hidden="true"><use href="#i-login"></use></svg> ثبت مراجعه</a>
+            <a asp-controller="Visits" asp-action="Open"><svg aria-hidden="true"><use href="#i-users-group"></use></svg> افراد حاضر</a>
+            <a asp-controller="Visits" asp-action="Index"><svg aria-hidden="true"><use href="#i-history"></use></svg> سوابق مراجعات</a>
+
+            <div class="nav-heading">اطلاعات پایه</div>
+            <a asp-controller="Persons" asp-action="Index"><svg aria-hidden="true"><use href="#i-users"></use></svg> اشخاص</a>
+            <a asp-controller="OrganizationalUnits" asp-action="Index"><svg aria-hidden="true"><use href="#i-sitemap"></use></svg> واحدهای سازمانی</a>
+            <a asp-controller="BlackList" asp-action="Index"><svg aria-hidden="true"><use href="#i-shield-off"></use></svg> بلک‌لیست</a>
+
+            @if (User.IsInRole("مدیر سامانه"))
+            {
+                <div class="nav-heading">مدیریت</div>
+                <a asp-controller="Users" asp-action="Index"><svg aria-hidden="true"><use href="#i-lock"></use></svg> کاربران و دسترسی‌ها</a>
+            }
+
+            <div class="sidebar-footer">
+                <div>@PersianDate.ToPersianLong(DateTime.Now)</div>
+                <div>@PersianDate.ToPersianTime(DateTime.Now.TimeOfDay)</div>
+            </div>
+        </aside>
+
+        <main class="content" id="main-content">
+            <nav class="breadcrumb" aria-label="مسیر صفحه">
+                <a asp-controller="Home" asp-action="Index">
+                    <svg style="width:14px;height:14px;vertical-align:-2px" aria-hidden="true"><use href="#i-home"></use></svg>
+                    خانه
+                </a>
+                @if (sectionLabel != "داشبورد" && sectionLabel != pageTitle)
+                {
+                    <span class="sep" aria-hidden="true">/</span>
+                    <span>@sectionLabel</span>
+                }
+                <span class="sep" aria-hidden="true">/</span>
+                <span aria-current="page">@pageTitle</span>
+            </nav>
+
+            @if (TempData["Success"] is string success)
+            {
+                <div class="alert success" role="status" data-auto-dismiss>
+                    <svg aria-hidden="true"><use href="#i-check-circle"></use></svg>
+                    <div>@success</div>
+                    <button type="button" class="close" aria-label="بستن">×</button>
+                </div>
+            }
+            @if (TempData["Error"] is string error)
+            {
+                <div class="alert danger" role="alert" data-auto-dismiss>
+                    <svg aria-hidden="true"><use href="#i-alert"></use></svg>
+                    <div>@error</div>
+                    <button type="button" class="close" aria-label="بستن">×</button>
+                </div>
+            }
+
+            @RenderBody()
+        </main>
     </div>
-    <div class="userbox">
-        @if (User.Identity?.IsAuthenticated == true)
-        {
-            <span>@User.Identity.Name</span>
-            <form asp-controller="Account" asp-action="Logout" method="post" class="inline">
-                @Html.AntiForgeryToken()
-                <button class="linkbutton" type="submit">خروج</button>
-            </form>
-        }
+
+    <button type="button" class="to-top" id="to-top" aria-label="بازگشت به بالای صفحه">
+        <svg aria-hidden="true"><use href="#i-arrow-up"></use></svg>
+    </button>
+
+    <div class="form-loading" aria-hidden="true">
+        <div class="loader-box"><span class="spinner"></span><span>در حال ثبت اطلاعات...</span></div>
     </div>
-</header>
-<div class="app-shell">
-    <div class="sidebar-overlay" id="sidebar-overlay"></div>
-    <aside class="sidebar" id="main-sidebar">
-        <button type="button" class="sidebar-close" id="sidebar-close" aria-label="بستن منو">×</button>
-        <a asp-controller="Home" asp-action="Index">داشبورد</a>
-        <a asp-controller="Persons" asp-action="Index">اشخاص</a>
-        <a asp-controller="Visits" asp-action="Create">ثبت مراجعه</a>
-        <a asp-controller="Visits" asp-action="Open">افراد حاضر</a>
-        <a asp-controller="Visits" asp-action="Index">سوابق مراجعات</a>
-        <a asp-controller="BlackList" asp-action="Index">بلک‌لیست</a>
-        <a asp-controller="OrganizationalUnits" asp-action="Index">واحدهای سازمانی</a>
-        @if (User.IsInRole("مدیر سامانه"))
-        {
-            <a asp-controller="Users" asp-action="Index">کاربران و دسترسی‌ها</a>
-        }
-    </aside>
-    <main class="content">
-        @if (TempData["Success"] is string success) { <div class="alert success">@success</div> }
-        @if (TempData["Error"] is string error) { <div class="alert danger">@error</div> }
-        @RenderBody()
-    </main>
-</div>
-<script src="~/js/site.js" asp-append-version="true"></script>
-@await RenderSectionAsync("Scripts", required: false)
+
+    <script src="~/lib/jquery.min.js" asp-append-version="true"></script>
+    <script src="~/lib/persian-datepicker/dist/js/persian-datepicker.min.js" asp-append-version="true"></script>
+    <script src="~/lib/bootstrap-timepicker/js/bootstrap-timepicker.min.js" asp-append-version="true"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

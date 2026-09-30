@@ -1,10 +1,63 @@
 @model VisitRegistry.ViewModels.UserCreateViewModel
 @using Microsoft.AspNetCore.Identity
-@{ ViewData["Title"] = "ثبت کاربر"; var roles=(IEnumerable<IdentityRole>)ViewBag.Roles; }
-<div class="page-head"><h1>ثبت کاربر جدید</h1><a asp-action="Index">بازگشت</a></div>
-<div class="card"><form asp-action="Create" method="post">@Html.AntiForgeryToken()<div asp-validation-summary="All" class="validation"></div>
-<label asp-for="UserName"></label><input asp-for="UserName" autocomplete="username" />
-<label asp-for="DisplayName"></label><input asp-for="DisplayName" />
-<label asp-for="Password"></label><input asp-for="Password" autocomplete="new-password" />
-<label asp-for="Role"></label><select asp-for="Role"><option value="">انتخاب نقش</option>@foreach(var r in roles){<option value="@r.Name">@r.Name</option>}</select>
-<button class="button" type="submit">ایجاد کاربر</button></form></div>
+@{
+    ViewData["Title"] = "ثبت کاربر";
+    var roles = (IEnumerable<IdentityRole>)ViewBag.Roles;
+}
+<div class="page-head">
+    <div class="page-title">
+        <span class="page-title-icon" aria-hidden="true"><svg><use href="#i-user-plus"></use></svg></span>
+        <div>
+            <h1>ثبت کاربر جدید</h1>
+            <p class="subtitle">ساخت حساب کاربری و تعیین سطح دسترسی</p>
+        </div>
+    </div>
+    <a asp-action="Index">بازگشت به فهرست</a>
+</div>
+
+<div class="card form-grid two">
+    <div class="card-head">
+        <h2>اطلاعات حساب</h2>
+    </div>
+
+    <form asp-action="Create" method="post">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="All" class="validation validation-summary-errors"></div>
+
+        <div class="span-2">
+            <label asp-for="UserName">نام کاربری <span class="req">*</span></label>
+            <input asp-for="UserName" autocomplete="off" />
+            <span asp-validation-for="UserName" class="validation"></span>
+        </div>
+
+        <div class="span-2">
+            <label asp-for="DisplayName">نام نمایشی <span class="req">*</span></label>
+            <input asp-for="DisplayName" autocomplete="name" />
+            <span asp-validation-for="DisplayName" class="validation"></span>
+        </div>
+
+        <div class="span-2">
+            <label asp-for="Password">رمز عبور <span class="req">*</span></label>
+            <input asp-for="Password" autocomplete="new-password" />
+            <span class="field-help">حداقل ۸ کاراکتر شامل حداقل یک رقم.</span>
+            <span asp-validation-for="Password" class="validation"></span>
+        </div>
+
+        <div class="span-2">
+            <label asp-for="Role">نقش <span class="req">*</span></label>
+            <select asp-for="Role">
+                <option value="">انتخاب نقش</option>
+                @foreach (var r in roles)
+                {
+                    <option value="@r.Name">@r.Name</option>
+                }
+            </select>
+            <span asp-validation-for="Role" class="validation"></span>
+        </div>
+
+        <div class="form-actions span-2">
+            <button class="button" type="submit"><svg aria-hidden="true"><use href="#i-check"></use></svg> ایجاد کاربر</button>
+            <a class="button ghost" asp-action="Index">انصراف</a>
+        </div>
+    </form>
+</div>

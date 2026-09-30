@@ -1,0 +1,20 @@
+@* پاورقی جدول: شمارش رکورد، انتخاب تعداد در صفحه، صفحه‌بندی و چاپ *@
+<div class="table-footer js-pager-wrap">
+    <div class="js-row-count"></div>
+    <div class="table-footer-tools">
+        <label class="table-page-size">
+            <span class="sr-only">تعداد رکورد در هر صفحه</span>
+            <select class="js-page-size">
+                <option value="10">۱۰</option>
+                <option value="15" selected>۱۵</option>
+                <option value="25">۲۵</option>
+                <option value="50">۵۰</option>
+                <option value="100">۱۰۰</option>
+            </select>
+        </label>
+        <div class="pager js-pager"></div>
+        <button type="button" class="button small secondary" data-print title="چاپ این فهرست">
+            <svg aria-hidden="true"><use href="#i-print"></use></svg> چاپ
+        </button>
+    </div>
+</div>

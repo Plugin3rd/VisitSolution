@@ -4,29 +4,67 @@
     ViewData["Title"] = "ورود";
 }
 <!doctype html>
-<html lang="fa" dir="rtl">
+<html lang="fa" dir="rtl" data-theme="light">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>ورود - سامانه ثبت مراجعات</title>
-    <link rel="stylesheet" href="~/css/site.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#0f2557" />
+    <title>ورود | سامانه ثبت مراجعات</title>
+    <link rel="preload" href="~/fonts/Vazirmatn-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <script>
+        // اعمال پوسته پیش از رندر برای جلوگیری از پرش رنگ
+        (() => {
+            try {
+                const saved = localStorage.getItem('vr.theme');
+                const dark = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+                document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+            } catch { /* نادیده گرفته می‌شود */ }
+        })();
+    </script>
 </head>
 <body class="login-page">
-<div class="login-card">
-    <h1>سامانه ثبت مراجعات</h1>
-    <p>ورود به سامانه</p>
-    <form asp-action="Login" method="post">
-        @Html.AntiForgeryToken()
-        <div asp-validation-summary="All" class="validation"></div>
-        <label asp-for="UserName"></label>
-        <input asp-for="UserName" autocomplete="username" />
-        <span asp-validation-for="UserName" class="validation"></span>
-        <label asp-for="Password"></label>
-        <input asp-for="Password" autocomplete="current-password" />
-        <span asp-validation-for="Password" class="validation"></span>
-        <label class="check"><input asp-for="RememberMe" /> مرا به خاطر بسپار</label>
-        <button class="button full" type="submit">ورود به سامانه</button>
-    </form>
-</div>
+    <partial name="_Icons" />
+
+    <button type="button" class="iconbtn login-theme-toggle" data-theme-toggle aria-pressed="false" aria-label="تغییر پوسته روشن و تاریک" style="color:rgba(255,255,255,.85)">
+        <svg class="theme-light" aria-hidden="true" style="width:20px;height:20px"><use href="#i-sun"></use></svg>
+        <svg class="theme-dark" aria-hidden="true" style="width:20px;height:20px"><use href="#i-moon"></use></svg>
+    </button>
+
+    <div class="login-card">
+        <div class="login-logo" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
+            </svg>
+        </div>
+        <h1>سامانه ثبت مراجعات</h1>
+        <p class="login-sub">برای ورود به سامانه، نام کاربری و رمز عبور خود را وارد کنید.</p>
+
+        <form asp-action="Login" method="post" autocomplete="on">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="All" class="validation validation-summary-errors"></div>
+
+            <label asp-for="UserName">نام کاربری</label>
+            <input asp-for="UserName" autocomplete="username" autofocus />
+
+            <label asp-for="Password">رمز عبور</label>
+            <input asp-for="Password" autocomplete="current-password" />
+
+            <label class="check"><input asp-for="RememberMe" /> مرا به خاطر بسپار</label>
+
+            <button class="button full lg" type="submit">
+                <svg aria-hidden="true"><use href="#i-login"></use></svg> ورود به سامانه
+            </button>
+        </form>
+
+        <div class="login-foot">نسخه ۱٫۰ — محیط داخلی سازمان</div>
+    </div>
+
+    <div class="form-loading" aria-hidden="true">
+        <div class="loader-box"><span class="spinner"></span><span>در حال ورود...</span></div>
+    </div>
+
+    <script src="~/js/site.js" asp-append-version="true"></script>
 </body>
 </html>
