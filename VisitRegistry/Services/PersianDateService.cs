@@ -18,9 +18,10 @@ public class PersianDateService
         "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"
     ];
 
+    // Indexed by (int) PersianCalendar.GetDayOfWeek: Sunday=0 … Saturday=6
     private static readonly string[] WeekDayNames =
     [
-        "شنبه", "یک‌شنبه", "دوشنبه", "سه‌شنبه", "چهارشنبه", "پنج‌شنبه", "جمعه"
+        "یک‌شنبه", "دوشنبه", "سه‌شنبه", "چهارشنبه", "پنج‌شنبه", "جمعه", "شنبه"
     ];
 
     private readonly PersianCalendar _calendar = new();
