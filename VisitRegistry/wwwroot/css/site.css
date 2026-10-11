@@ -750,7 +750,10 @@ button { line-height: inherit; }
     max-width: none;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     column-gap: 20px;
+    row-gap: 14px;
+    align-items: start;
 }
+.form-grid.two form > .validation-summary-valid { display: none; }
 .form-grid.two form > .span-2 { grid-column: 1 / -1; }
 .form-grid.two form > .form-actions { grid-column: 1 / -1; display: flex; gap: 10px; flex-wrap: wrap; }
 

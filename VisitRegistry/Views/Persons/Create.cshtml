@@ -19,9 +19,9 @@
         <h2>اطلاعات فردی</h2>
     </div>
 
-    <form asp-action="Create" method="post">
+    <form asp-action="Create" method="post" dir="rtl">
         @Html.AntiForgeryToken()
-        <div asp-validation-summary="All" class="validation validation-summary-errors"></div>
+        <div asp-validation-summary="All" class="validation validation-summary-errors span-2"></div>
 
         <div>
             <label asp-for="FirstName">نام <span class="req">*</span></label>
