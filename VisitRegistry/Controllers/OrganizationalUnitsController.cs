@@ -10,11 +10,17 @@ namespace VisitRegistry.Controllers;
 [Authorize]
 public class OrganizationalUnitsController(ApplicationDbContext db, ICurrentUserService currentUser, AuditService audit) : Controller
 {
-    public async Task<IActionResult> Index(string? search)
+    public async Task<IActionResult> Index(string? search, int? unitType)
     {
         search = search?.Trim();
 
         var query = db.OrganizationalUnits.AsNoTracking();
+
+        if (unitType.HasValue)
+        {
+            query = query.Where(x => x.UnitType == (UnitType)unitType.Value);
+            ViewBag.SelectedUnitType = unitType.Value;
+        }
 
         if (!string.IsNullOrWhiteSpace(search))
         {

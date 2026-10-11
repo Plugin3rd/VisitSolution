@@ -29,8 +29,8 @@ public class Person : AuditableBase
     [Display(Name = "وضعیت")]
     public bool IsActive { get; set; } = true;
 
-    [Display(Name = "واحد سازمانی")]
-    [Range(1, int.MaxValue, ErrorMessage = "انتخاب واحد سازمانی الزامی است.")]
+    [Display(Name = "واحد فعالیت")]
+    [Range(1, int.MaxValue, ErrorMessage = "انتخاب واحد فعالیت الزامی است.")]
     public int OrganizationalUnitId { get; set; }
 
     // Navigation properties are nullable because the MVC form posts only the FK (OrganizationalUnitId).

@@ -1,4 +1,5 @@
 @model VisitRegistry.Models.OrganizationalUnit
+@using VisitRegistry.Models
 @{ ViewData["Title"] = "ثبت واحد جدید"; }
 <div class="page-head">
     <div class="page-title">
@@ -29,6 +30,14 @@
         <div>
             <label asp-for="Code">کد واحد</label>
             <input asp-for="Code" maxlength="50" />
+        </div>
+
+        <div>
+            <label asp-for="UnitType">نوع واحد <span class="req">*</span></label>
+            <select asp-for="UnitType" asp-items="Html.GetEnumSelectList<UnitType>()">
+                <option value="">انتخاب کنید</option>
+            </select>
+            <span asp-validation-for="UnitType" class="validation"></span>
         </div>
 
         <div class="span-2">

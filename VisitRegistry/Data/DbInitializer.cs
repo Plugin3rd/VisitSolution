@@ -46,11 +46,14 @@ public static class DbInitializer
         if (!await db.OrganizationalUnits.AnyAsync())
         {
             db.OrganizationalUnits.AddRange(
-                new OrganizationalUnit { Title = "مدیریت", IsActive = true },
-                new OrganizationalUnit { Title = "حراست", IsActive = true },
-                new OrganizationalUnit { Title = "منابع انسانی", IsActive = true },
-                new OrganizationalUnit { Title = "امور مالی", IsActive = true },
-                new OrganizationalUnit { Title = "فناوری اطلاعات", IsActive = true });
+                new OrganizationalUnit { Title = "مدیریت", UnitType = UnitType.ActivityUnit, IsActive = true },
+                new OrganizationalUnit { Title = "حراست", UnitType = UnitType.ActivityUnit, IsActive = true },
+                new OrganizationalUnit { Title = "منابع انسانی", UnitType = UnitType.ActivityUnit, IsActive = true },
+                new OrganizationalUnit { Title = "امور مالی", UnitType = UnitType.ActivityUnit, IsActive = true },
+                new OrganizationalUnit { Title = "فناوری اطلاعات", UnitType = UnitType.ActivityUnit, IsActive = true },
+                new OrganizationalUnit { Title = "دپارتمان обслугуه", UnitType = UnitType.VisitingUnit, IsActive = true },
+                new OrganizationalUnit { Title = "دفتر امور اداری", UnitType = UnitType.VisitingUnit, IsActive = true },
+                new OrganizationalUnit { Title = "بخش پزشک قانونی", UnitType = UnitType.VisitingUnit, IsActive = true });
             await db.SaveChangesAsync();
         }
     }

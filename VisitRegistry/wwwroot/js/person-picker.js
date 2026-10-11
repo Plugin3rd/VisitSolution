@@ -52,7 +52,7 @@
             searchInput.value = `${person.name} - ${person.nationalCode}`;
             selectedBox.innerHTML = `
                 <div class="person-selected-name">${escapeHtml(person.name)}</div>
-                <div class="person-selected-meta">کد ملی: ${escapeHtml(person.nationalCode)}${person.mobile ? ` | موبایل: ${escapeHtml(person.mobile)}` : ''}${person.unit ? ` | واحد: ${escapeHtml(person.unit)}` : ''}</div>
+                <div class="person-selected-meta">کد ملی: ${escapeHtml(person.nationalCode)}${person.mobile ? ` | موبایل: ${escapeHtml(person.mobile)}` : ''}${person.activityUnit ? ` | واحد فعالیت: ${escapeHtml(person.activityUnit)}` : ''}</div>
                 <button type="button" class="person-clear">تغییر شخص</button>`;
             selectedBox.hidden = false;
             setHelp('شخص انتخاب شد. برای تغییر، روی «تغییر شخص» بزنید.');
@@ -90,7 +90,7 @@
                     <button type="button" class="person-result" role="option" data-id="${escapeHtml(person.id)}">
                         <span class="person-result-name">${escapeHtml(person.name)}</span>
                         <span class="person-result-meta">کد ملی: ${escapeHtml(person.nationalCode)}${person.mobile ? ` | ${escapeHtml(person.mobile)}` : ''}</span>
-                        ${person.unit ? `<span class="person-result-unit">واحد: ${escapeHtml(person.unit)}</span>` : ''}
+                        ${person.activityUnit ? `<span class="person-result-unit">واحد فعالیت: ${escapeHtml(person.activityUnit)}</span>` : ''}
                     </button>`
                 )
                 .join('');

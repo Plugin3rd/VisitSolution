@@ -30,6 +30,10 @@ public class PersonsController(ApplicationDbContext db, ICurrentUserService curr
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(Person model)
     {
+        model.NationalCode = NormalizeNationalCode(model.NationalCode);
+        if (!IsValidNationalCode(model.NationalCode))
+            ModelState.AddModelError(nameof(model.NationalCode), "شماره ملی معتبر نیست.");
+
         if (await db.Persons.AnyAsync(x => x.NationalCode == model.NationalCode))
             ModelState.AddModelError(nameof(model.NationalCode), "این شماره ملی قبلاً ثبت شده است.");
 
@@ -127,5 +131,29 @@ public class PersonsController(ApplicationDbContext db, ICurrentUserService curr
     }
 
     private async Task LoadUnitsAsync() =>
-        ViewBag.Units = await db.OrganizationalUnits.Where(x => x.IsActive).OrderBy(x => x.Title).ToListAsync();
+        ViewBag.Units = await db.OrganizationalUnits.Where(x => x.IsActive && x.UnitType == UnitType.ActivityUnit).OrderBy(x => x.Title).ToListAsync();
+
+    private static string NormalizeNationalCode(string? nationalCode) =>
+        (nationalCode ?? string.Empty)
+            .Replace('۰', '0').Replace('۱', '1').Replace('۲', '2').Replace('۳', '3').Replace('۴', '4')
+            .Replace('۵', '5').Replace('۶', '6').Replace('۷', '7').Replace('۸', '8').Replace('۹', '9')
+            .Replace('٠', '0').Replace('١', '1').Replace('٢', '2').Replace('٣', '3').Replace('٤', '4')
+            .Replace('٥', '5').Replace('٦', '6').Replace('٧', '7').Replace('٨', '8').Replace('٩', '9');
+
+    private static bool IsValidNationalCode(string nationalCode)
+    {
+        if (nationalCode.Length != 10 || nationalCode.Any(character => character is < '0' or > '9'))
+            return false;
+
+        if (nationalCode.All(character => character == nationalCode[0]))
+            return false;
+
+        var sum = 0;
+        for (var index = 0; index < 9; index++)
+            sum += (nationalCode[index] - '0') * (10 - index);
+
+        var remainder = sum % 11;
+        var checkDigit = remainder < 2 ? remainder : 11 - remainder;
+        return nationalCode[9] - '0' == checkDigit;
+    }
 }

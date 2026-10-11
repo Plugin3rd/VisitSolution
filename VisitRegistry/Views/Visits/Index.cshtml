@@ -15,7 +15,7 @@
     <a class="button" asp-action="Create"><svg aria-hidden="true"><use href="#i-plus"></use></svg> ثبت مراجعه</a>
 </div>
 
-@await Html.PartialAsync("_SearchBar", "نام، نام خانوادگی یا شماره ملی")
+@await Html.PartialAsync("_SearchBar", "نام، نام خانوادگی، شماره ملی، واحد فعالیت یا واحد مراجعه")
 
 <div class="card flush">
     <div class="table-toolbar">
@@ -31,27 +31,29 @@
 
     <div class="table-wrap">
         <table class="responsive-table" data-table>
-            <thead>
+<thead>
+            <tr>
+                <th class="sortable">شخص</th>
+                <th>شماره ملی</th>
+                <th class="sortable">تاریخ ورود</th>
+                <th>ساعت ورود</th>
+                <th>واحد فعالیت</th>
+                <th>واحد مراجعه‌کننده</th>
+                <th>ساعت خروج</th>
+                <th>وضعیت</th>
+                <th>عملیات</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
                 <tr>
-                    <th class="sortable">شخص</th>
-                    <th>شماره ملی</th>
-                    <th class="sortable">تاریخ ورود</th>
-                    <th>ساعت ورود</th>
-                    <th>واحد مراجعه‌کننده</th>
-                    <th>ساعت خروج</th>
-                    <th>وضعیت</th>
-                    <th>عملیات</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model)
-                {
-                    <tr>
-                        <td data-label="شخص">@item.Person.FirstName @item.Person.LastName</td>
-                        <td data-label="شماره ملی"><span class="mono">@item.Person.NationalCode</span></td>
-                        <td data-label="تاریخ ورود"><span class="mono">@PersianDate.ToPersianDigitsDate(item.EntryDate)</span></td>
-                        <td data-label="ساعت ورود"><span class="mono">@PersianDate.ToPersianTime(item.EntryTime)</span></td>
-                        <td data-label="واحد مراجعه‌کننده">@item.VisitingUnit.Title</td>
+                    <td data-label="شخص">@item.Person.FirstName @item.Person.LastName</td>
+                    <td data-label="شماره ملی"><span class="mono">@item.Person.NationalCode</span></td>
+                    <td data-label="تاریخ ورود"><span class="mono">@PersianDate.ToPersianDigitsDate(item.EntryDate)</span></td>
+                    <td data-label="ساعت ورود"><span class="mono">@PersianDate.ToPersianTime(item.EntryTime)</span></td>
+                    <td data-label="واحد فعالیت">@(item.Person.OrganizationalUnit?.Title ?? "—")</td>
+                    <td data-label="واحد مراجعه‌کننده">@(item.VisitingUnit?.Title ?? "—")</td>
                         <td data-label="ساعت خروج">
                             @if (item.ExitTime.HasValue)
                             {

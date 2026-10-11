@@ -2,6 +2,15 @@ using System.ComponentModel.DataAnnotations;
 
 namespace VisitRegistry.Models;
 
+public enum UnitType
+{
+    [Display(Name = "واحد فعالیت")]
+    ActivityUnit = 1,
+    
+    [Display(Name = "واحد مراجعه")]
+    VisitingUnit = 2
+}
+
 public class OrganizationalUnit : AuditableBase
 {
     public int OrganizationalUnitId { get; set; }
@@ -14,6 +23,10 @@ public class OrganizationalUnit : AuditableBase
     [MaxLength(50)]
     [Display(Name = "کد واحد")]
     public string? Code { get; set; }
+
+    [Display(Name = "نوع واحد")]
+    [Required(ErrorMessage = "نوع واحد الزامی است.")]
+    public UnitType UnitType { get; set; } = UnitType.ActivityUnit;
 
     [Display(Name = "فعال")]
     public bool IsActive { get; set; } = true;

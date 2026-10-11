@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using VisitRegistry.Data;
+using VisitRegistry.Models;
 using VisitRegistry.Services;
 using VisitRegistry.ViewModels;
 
@@ -14,10 +15,20 @@ public class VisitsController(ApplicationDbContext db, VisitService visits) : Co
     {
         var query = db.Visits
             .Include(x => x.Person)
+                .ThenInclude(p => p.OrganizationalUnit)
             .Include(x => x.VisitingUnit)
             .AsNoTracking();
         if (!string.IsNullOrWhiteSpace(search))
-            query = query.Where(x => x.Person.FirstName.Contains(search) || x.Person.LastName.Contains(search) || x.Person.NationalCode.Contains(search));
+        {
+            var normalizedSearch = NormalizeDigits(search);
+
+            query = query.Where(x =>
+                x.Person.FirstName.Contains(search) ||
+                x.Person.LastName.Contains(search) ||
+                x.Person.NationalCode.Contains(normalizedSearch) ||
+                (x.Person.OrganizationalUnit != null && x.Person.OrganizationalUnit.Title.Contains(search)) ||
+                x.VisitingUnit.Title.Contains(search));
+        }
         var result = await query
             .OrderByDescending(x => x.EntryDate)
             .Take(500)
@@ -33,7 +44,7 @@ public class VisitsController(ApplicationDbContext db, VisitService visits) : Co
     public async Task<IActionResult> Create()
     {
         ViewBag.Units = await db.OrganizationalUnits
-            .Where(x => x.IsActive)
+            .Where(x => x.IsActive && x.UnitType == UnitType.VisitingUnit)
             .OrderBy(x => x.Title)
             .ToListAsync();
 
@@ -51,7 +62,9 @@ public class VisitsController(ApplicationDbContext db, VisitService visits) : Co
         term = NormalizeDigits(term);
 
         var query = db.Persons
-            .Where(x => x.IsActive)
+            .Where(x => x.IsActive 
+                && x.OrganizationalUnit != null 
+                && x.OrganizationalUnit.UnitType == UnitType.ActivityUnit)
             .AsNoTracking();
 
         if (term.Length >= 2)
@@ -73,7 +86,7 @@ public class VisitsController(ApplicationDbContext db, VisitService visits) : Co
                 name = x.FirstName + " " + x.LastName,
                 nationalCode = x.NationalCode,
                 mobile = x.Mobile,
-                unit = x.OrganizationalUnit != null ? x.OrganizationalUnit.Title : ""
+                activityUnit = x.OrganizationalUnit != null ? x.OrganizationalUnit.Title : ""
             })
             .ToListAsync();
 
@@ -88,7 +101,7 @@ public class VisitsController(ApplicationDbContext db, VisitService visits) : Co
         if (!ModelState.IsValid)
         {
             ViewBag.Units = await db.OrganizationalUnits
-                .Where(x => x.IsActive)
+                .Where(x => x.IsActive && x.UnitType == UnitType.VisitingUnit)
                 .OrderBy(x => x.Title)
                 .ToListAsync();
             return View(model);
@@ -99,7 +112,7 @@ public class VisitsController(ApplicationDbContext db, VisitService visits) : Co
         {
             ModelState.AddModelError(string.Empty, error);
             ViewBag.Units = await db.OrganizationalUnits
-                .Where(x => x.IsActive)
+                .Where(x => x.IsActive && x.UnitType == UnitType.VisitingUnit)
                 .OrderBy(x => x.Title)
                 .ToListAsync();
             return View(model);
@@ -145,6 +158,7 @@ public class VisitsController(ApplicationDbContext db, VisitService visits) : Co
 
         var query = db.Visits
             .Include(x => x.Person)
+                .ThenInclude(p => p.OrganizationalUnit)
             .Include(x => x.VisitingUnit)
             .Where(x => x.ExitDate == null && x.ExitTime == null)
             .AsNoTracking();
@@ -158,6 +172,7 @@ public class VisitsController(ApplicationDbContext db, VisitService visits) : Co
                 x.Person.LastName.Contains(search) ||
                 x.Person.NationalCode.Contains(normalizedSearch) ||
                 x.Person.Mobile.Contains(normalizedSearch) ||
+                (x.Person.OrganizationalUnit != null && x.Person.OrganizationalUnit.Title.Contains(search)) ||
                 x.VisitingUnit.Title.Contains(search) ||
                 (x.EntryDescription != null && x.EntryDescription.Contains(search)));
         }

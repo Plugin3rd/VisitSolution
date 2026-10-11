@@ -38,7 +38,7 @@
                     <th class="sortable">نام خانوادگی</th>
                     <th class="sortable">شماره ملی</th>
                     <th>موبایل</th>
-                    <th>واحد سازمانی</th>
+                    <th>واحد فعالیت</th>
                     <th>وضعیت</th>
                     @if (User.IsInRole("مدیر سامانه") || User.IsInRole("اپراتور"))
                     {
@@ -54,7 +54,7 @@
                         <td data-label="نام خانوادگی">@item.LastName</td>
                         <td data-label="شماره ملی"><span class="mono">@item.NationalCode</span></td>
                         <td data-label="موبایل"><span class="mono">@item.Mobile</span></td>
-                        <td data-label="واحد سازمانی">@(item.OrganizationalUnit?.Title ?? "—")</td>
+                        <td data-label="واحد فعالیت">@(item.OrganizationalUnit?.Title ?? "—")</td>
                         <td data-label="وضعیت">
                             @if (item.IsActive)
                             {

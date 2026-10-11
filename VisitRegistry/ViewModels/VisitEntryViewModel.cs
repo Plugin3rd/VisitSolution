@@ -7,7 +7,7 @@ public class VisitEntryViewModel
     [Range(1, int.MaxValue, ErrorMessage = "انتخاب شخص الزامی است.")]
     public int PersonId { get; set; }
 
-    [Required(ErrorMessage = "انتخاب واحد مراجعه‌کننده الزامی است.")]
+    [Required(ErrorMessage = "انتخاب واحد مراجعه (مقصد) الزامی است.")]
     public int VisitingUnitId { get; set; }
 
     [Required(ErrorMessage = "ساعت ورود الزامی است.")]

@@ -19,7 +19,7 @@ public class Visit : AuditableBase
     [Display(Name = "توضیحات ورود")]
     public string? EntryDescription { get; set; }
 
-    [Display(Name = "واحد مراجعه‌کننده")]
+    [Display(Name = "واحد مراجعه (مقصد)")]
     public int VisitingUnitId { get; set; }
     // Loaded by EF after binding; the form posts only VisitingUnitId.
     public OrganizationalUnit? VisitingUnit { get; set; }
